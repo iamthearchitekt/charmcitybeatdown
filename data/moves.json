@@ -1,0 +1,1510 @@
+{
+  "fighters": [
+    {
+      "id": "marcus",
+      "name": "MARCUS",
+      "subtitle": "THE DOCKYARD SENTINEL",
+      "speed": 5.2,
+      "color": "#61d8ee",
+      "moves": {
+        "lp": {
+          "name": "Pier Jab",
+          "startup": 4,
+          "active": 3,
+          "recovery": 7,
+          "damage": 45,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -132,
+            67,
+            34
+          ],
+          "cancel_start": 4,
+          "cancel_end": 13,
+          "cancels": [
+            "hp",
+            "lk",
+            "special1",
+            "special2"
+          ]
+        },
+        "hp": {
+          "name": "Iron Cross",
+          "startup": 8,
+          "active": 4,
+          "recovery": 13,
+          "damage": 100,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            20,
+            -135,
+            92,
+            44
+          ],
+          "cancel_start": 8,
+          "cancel_end": 18,
+          "cancels": [
+            "special1",
+            "special2"
+          ]
+        },
+        "lk": {
+          "name": "Check Kick",
+          "startup": 6,
+          "active": 4,
+          "recovery": 9,
+          "damage": 60,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -83,
+            91,
+            35
+          ],
+          "cancel_start": 6,
+          "cancel_end": 16,
+          "cancels": [
+            "hk",
+            "special1",
+            "special2"
+          ]
+        },
+        "hk": {
+          "name": "Harbor Heel",
+          "startup": 11,
+          "active": 5,
+          "recovery": 16,
+          "damage": 130,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            20,
+            -146,
+            121,
+            90
+          ],
+          "cancel_start": 11,
+          "cancel_end": 22,
+          "cancels": []
+        },
+        "c_lp": {
+          "name": "Low Jab",
+          "startup": 4,
+          "active": 3,
+          "recovery": 7,
+          "damage": 40,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -74,
+            68,
+            29
+          ],
+          "cancel_start": 4,
+          "cancel_end": 13,
+          "cancels": [
+            "c_hp",
+            "c_lk",
+            "special1",
+            "special2"
+          ]
+        },
+        "c_hp": {
+          "name": "Dock Upper",
+          "startup": 8,
+          "active": 5,
+          "recovery": 14,
+          "damage": 105,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            10,
+            -156,
+            65,
+            106
+          ],
+          "cancel_start": 8,
+          "cancel_end": 19,
+          "cancels": [
+            "special2"
+          ],
+          "launch": true,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "c_lk": {
+          "name": "Ankle Check",
+          "startup": 6,
+          "active": 4,
+          "recovery": 10,
+          "damage": 55,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "low",
+          "box": [
+            17,
+            -33,
+            92,
+            29
+          ],
+          "cancel_start": 6,
+          "cancel_end": 16,
+          "cancels": [
+            "c_hk",
+            "special1",
+            "special2"
+          ]
+        },
+        "c_hk": {
+          "name": "Brick Sweep",
+          "startup": 10,
+          "active": 5,
+          "recovery": 18,
+          "damage": 120,
+          "hitstun": 30,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "low",
+          "box": [
+            12,
+            -36,
+            126,
+            32
+          ],
+          "cancel_start": 10,
+          "cancel_end": 21,
+          "cancels": [],
+          "knockdown": true,
+          "launch_speed": 10.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "air_lp": {
+          "name": "Air Jab",
+          "startup": 4,
+          "active": 5,
+          "recovery": 9,
+          "damage": 50,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "overhead",
+          "box": [
+            15,
+            -123,
+            70,
+            44
+          ],
+          "cancel_start": 4,
+          "cancel_end": 15,
+          "cancels": []
+        },
+        "air_hp": {
+          "name": "Falling Hammer",
+          "startup": 7,
+          "active": 7,
+          "recovery": 13,
+          "damage": 105,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            12,
+            -117,
+            83,
+            63
+          ],
+          "cancel_start": 7,
+          "cancel_end": 20,
+          "cancels": []
+        },
+        "air_lk": {
+          "name": "Jump Check",
+          "startup": 5,
+          "active": 7,
+          "recovery": 10,
+          "damage": 65,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "overhead",
+          "box": [
+            13,
+            -82,
+            99,
+            49
+          ],
+          "cancel_start": 5,
+          "cancel_end": 18,
+          "cancels": []
+        },
+        "air_hk": {
+          "name": "Skyline Kick",
+          "startup": 8,
+          "active": 9,
+          "recovery": 15,
+          "damage": 120,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            12,
+            -94,
+            121,
+            61
+          ],
+          "cancel_start": 8,
+          "cancel_end": 23,
+          "cancels": []
+        },
+        "throw": {
+          "name": "Mooring Toss",
+          "startup": 4,
+          "active": 2,
+          "recovery": 22,
+          "damage": 155,
+          "hitstun": 33,
+          "blockstun": 10,
+          "pushback": 65,
+          "hitstop": 5,
+          "level": "throw",
+          "box": [
+            0,
+            -130,
+            67,
+            130
+          ],
+          "cancel_start": 4,
+          "cancel_end": 12,
+          "cancels": [],
+          "launch": true,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 10.5,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "special1": {
+          "name": "Harbor Current",
+          "startup": 11,
+          "active": 1,
+          "recovery": 20,
+          "damage": 110,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            0,
+            -110,
+            20,
+            30
+          ],
+          "cancel_start": 11,
+          "cancel_end": 18,
+          "cancels": [],
+          "projectile": true,
+          "chip": 10
+        },
+        "special2": {
+          "name": "Breakwater Rise",
+          "startup": 5,
+          "active": 13,
+          "recovery": 22,
+          "damage": 160,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 40,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            -12,
+            -192,
+            92,
+            145
+          ],
+          "cancel_start": 5,
+          "cancel_end": 24,
+          "cancels": [],
+          "rise": true,
+          "launch": true,
+          "chip": 12,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        }
+      },
+      "style": 0
+    },
+    {
+      "id": "maya",
+      "name": "MAYA",
+      "subtitle": "THE PRATT STREET PHANTOM",
+      "speed": 6,
+      "color": "#ff615d",
+      "moves": {
+        "lp": {
+          "name": "Pier Jab",
+          "startup": 3,
+          "active": 3,
+          "recovery": 7,
+          "damage": 45,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -132,
+            67,
+            34
+          ],
+          "cancel_start": 3,
+          "cancel_end": 12,
+          "cancels": [
+            "hp",
+            "lk",
+            "special1",
+            "special2"
+          ]
+        },
+        "hp": {
+          "name": "Alley Cross",
+          "startup": 7,
+          "active": 4,
+          "recovery": 13,
+          "damage": 100,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            20,
+            -135,
+            92,
+            44
+          ],
+          "cancel_start": 7,
+          "cancel_end": 17,
+          "cancels": [
+            "special1",
+            "special2"
+          ]
+        },
+        "lk": {
+          "name": "Check Kick",
+          "startup": 5,
+          "active": 4,
+          "recovery": 9,
+          "damage": 60,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -83,
+            91,
+            35
+          ],
+          "cancel_start": 5,
+          "cancel_end": 15,
+          "cancels": [
+            "hk",
+            "special1",
+            "special2"
+          ]
+        },
+        "hk": {
+          "name": "Neon Axe",
+          "startup": 10,
+          "active": 5,
+          "recovery": 16,
+          "damage": 130,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            20,
+            -146,
+            121,
+            90
+          ],
+          "cancel_start": 10,
+          "cancel_end": 21,
+          "cancels": []
+        },
+        "c_lp": {
+          "name": "Low Jab",
+          "startup": 3,
+          "active": 3,
+          "recovery": 7,
+          "damage": 40,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -74,
+            68,
+            29
+          ],
+          "cancel_start": 3,
+          "cancel_end": 12,
+          "cancels": [
+            "c_hp",
+            "c_lk",
+            "special1",
+            "special2"
+          ]
+        },
+        "c_hp": {
+          "name": "Dock Upper",
+          "startup": 7,
+          "active": 5,
+          "recovery": 14,
+          "damage": 105,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            10,
+            -156,
+            65,
+            106
+          ],
+          "cancel_start": 7,
+          "cancel_end": 18,
+          "cancels": [
+            "special2"
+          ],
+          "launch": true,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "c_lk": {
+          "name": "Ankle Check",
+          "startup": 5,
+          "active": 4,
+          "recovery": 10,
+          "damage": 55,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "low",
+          "box": [
+            17,
+            -33,
+            92,
+            29
+          ],
+          "cancel_start": 5,
+          "cancel_end": 15,
+          "cancels": [
+            "c_hk",
+            "special1",
+            "special2"
+          ]
+        },
+        "c_hk": {
+          "name": "Brick Sweep",
+          "startup": 10,
+          "active": 5,
+          "recovery": 18,
+          "damage": 120,
+          "hitstun": 30,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "low",
+          "box": [
+            12,
+            -36,
+            126,
+            32
+          ],
+          "cancel_start": 10,
+          "cancel_end": 21,
+          "cancels": [],
+          "knockdown": true,
+          "launch_speed": 10.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "air_lp": {
+          "name": "Air Jab",
+          "startup": 4,
+          "active": 5,
+          "recovery": 9,
+          "damage": 50,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "overhead",
+          "box": [
+            15,
+            -123,
+            70,
+            44
+          ],
+          "cancel_start": 4,
+          "cancel_end": 15,
+          "cancels": []
+        },
+        "air_hp": {
+          "name": "Falling Hammer",
+          "startup": 7,
+          "active": 7,
+          "recovery": 13,
+          "damage": 105,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            12,
+            -117,
+            83,
+            63
+          ],
+          "cancel_start": 7,
+          "cancel_end": 20,
+          "cancels": []
+        },
+        "air_lk": {
+          "name": "Jump Check",
+          "startup": 5,
+          "active": 7,
+          "recovery": 10,
+          "damage": 65,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "overhead",
+          "box": [
+            13,
+            -82,
+            99,
+            49
+          ],
+          "cancel_start": 5,
+          "cancel_end": 18,
+          "cancels": []
+        },
+        "air_hk": {
+          "name": "Skyline Kick",
+          "startup": 8,
+          "active": 9,
+          "recovery": 15,
+          "damage": 120,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            12,
+            -94,
+            121,
+            61
+          ],
+          "cancel_start": 8,
+          "cancel_end": 23,
+          "cancels": []
+        },
+        "throw": {
+          "name": "Switchback",
+          "startup": 4,
+          "active": 2,
+          "recovery": 22,
+          "damage": 155,
+          "hitstun": 33,
+          "blockstun": 10,
+          "pushback": 65,
+          "hitstop": 5,
+          "level": "throw",
+          "box": [
+            0,
+            -130,
+            67,
+            130
+          ],
+          "cancel_start": 4,
+          "cancel_end": 12,
+          "cancels": [],
+          "launch": true,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 10.5,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "special1": {
+          "name": "Pratt Street Rush",
+          "startup": 6,
+          "active": 13,
+          "recovery": 17,
+          "damage": 120,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            18,
+            -135,
+            88,
+            61
+          ],
+          "cancel_start": 6,
+          "cancel_end": 25,
+          "cancels": [
+            "special2"
+          ],
+          "travel": 7,
+          "chip": 8
+        },
+        "special2": {
+          "name": "Redline Vault",
+          "startup": 10,
+          "active": 10,
+          "recovery": 19,
+          "damage": 145,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            10,
+            -145,
+            104,
+            115
+          ],
+          "cancel_start": 10,
+          "cancel_end": 26,
+          "cancels": [],
+          "rise": true,
+          "travel": 4,
+          "launch": true,
+          "chip": 10,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        }
+      },
+      "style": 1
+    },
+    {
+      "id": "alex",
+      "name": "ALEX",
+      "subtitle": "THE DOCKYARD SENTINEL",
+      "speed": 5.2,
+      "color": "#61d8ee",
+      "moves": {
+        "lp": {
+          "name": "Pier Jab",
+          "startup": 4,
+          "active": 3,
+          "recovery": 7,
+          "damage": 45,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -132,
+            67,
+            34
+          ],
+          "cancel_start": 4,
+          "cancel_end": 13,
+          "cancels": [
+            "hp",
+            "lk",
+            "special1",
+            "special2"
+          ]
+        },
+        "hp": {
+          "name": "Iron Cross",
+          "startup": 8,
+          "active": 4,
+          "recovery": 13,
+          "damage": 100,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            20,
+            -135,
+            92,
+            44
+          ],
+          "cancel_start": 8,
+          "cancel_end": 18,
+          "cancels": [
+            "special1",
+            "special2"
+          ]
+        },
+        "lk": {
+          "name": "Check Kick",
+          "startup": 6,
+          "active": 4,
+          "recovery": 9,
+          "damage": 60,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -83,
+            91,
+            35
+          ],
+          "cancel_start": 6,
+          "cancel_end": 16,
+          "cancels": [
+            "hk",
+            "special1",
+            "special2"
+          ]
+        },
+        "hk": {
+          "name": "Harbor Heel",
+          "startup": 11,
+          "active": 5,
+          "recovery": 16,
+          "damage": 130,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            20,
+            -146,
+            121,
+            90
+          ],
+          "cancel_start": 11,
+          "cancel_end": 22,
+          "cancels": []
+        },
+        "c_lp": {
+          "name": "Low Jab",
+          "startup": 4,
+          "active": 3,
+          "recovery": 7,
+          "damage": 40,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -74,
+            68,
+            29
+          ],
+          "cancel_start": 4,
+          "cancel_end": 13,
+          "cancels": [
+            "c_hp",
+            "c_lk",
+            "special1",
+            "special2"
+          ]
+        },
+        "c_hp": {
+          "name": "Dock Upper",
+          "startup": 8,
+          "active": 5,
+          "recovery": 14,
+          "damage": 105,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            10,
+            -156,
+            65,
+            106
+          ],
+          "cancel_start": 8,
+          "cancel_end": 19,
+          "cancels": [
+            "special2"
+          ],
+          "launch": true,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "c_lk": {
+          "name": "Ankle Check",
+          "startup": 6,
+          "active": 4,
+          "recovery": 10,
+          "damage": 55,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "low",
+          "box": [
+            17,
+            -33,
+            92,
+            29
+          ],
+          "cancel_start": 6,
+          "cancel_end": 16,
+          "cancels": [
+            "c_hk",
+            "special1",
+            "special2"
+          ]
+        },
+        "c_hk": {
+          "name": "Brick Sweep",
+          "startup": 10,
+          "active": 5,
+          "recovery": 18,
+          "damage": 120,
+          "hitstun": 30,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "low",
+          "box": [
+            12,
+            -36,
+            126,
+            32
+          ],
+          "cancel_start": 10,
+          "cancel_end": 21,
+          "cancels": [],
+          "knockdown": true,
+          "launch_speed": 10.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "air_lp": {
+          "name": "Air Jab",
+          "startup": 4,
+          "active": 5,
+          "recovery": 9,
+          "damage": 50,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "overhead",
+          "box": [
+            15,
+            -123,
+            70,
+            44
+          ],
+          "cancel_start": 4,
+          "cancel_end": 15,
+          "cancels": []
+        },
+        "air_hp": {
+          "name": "Falling Hammer",
+          "startup": 7,
+          "active": 7,
+          "recovery": 13,
+          "damage": 105,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            12,
+            -117,
+            83,
+            63
+          ],
+          "cancel_start": 7,
+          "cancel_end": 20,
+          "cancels": []
+        },
+        "air_lk": {
+          "name": "Jump Check",
+          "startup": 5,
+          "active": 7,
+          "recovery": 10,
+          "damage": 65,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "overhead",
+          "box": [
+            13,
+            -82,
+            99,
+            49
+          ],
+          "cancel_start": 5,
+          "cancel_end": 18,
+          "cancels": []
+        },
+        "air_hk": {
+          "name": "Skyline Kick",
+          "startup": 8,
+          "active": 9,
+          "recovery": 15,
+          "damage": 120,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            12,
+            -94,
+            121,
+            61
+          ],
+          "cancel_start": 8,
+          "cancel_end": 23,
+          "cancels": []
+        },
+        "throw": {
+          "name": "Mooring Toss",
+          "startup": 4,
+          "active": 2,
+          "recovery": 22,
+          "damage": 155,
+          "hitstun": 33,
+          "blockstun": 10,
+          "pushback": 65,
+          "hitstop": 5,
+          "level": "throw",
+          "box": [
+            0,
+            -130,
+            67,
+            130
+          ],
+          "cancel_start": 4,
+          "cancel_end": 12,
+          "cancels": [],
+          "launch": true,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 10.5,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "special1": {
+          "name": "Harbor Current",
+          "startup": 11,
+          "active": 1,
+          "recovery": 20,
+          "damage": 110,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            0,
+            -110,
+            20,
+            30
+          ],
+          "cancel_start": 11,
+          "cancel_end": 18,
+          "cancels": [],
+          "projectile": true,
+          "chip": 10
+        },
+        "special2": {
+          "name": "Breakwater Rise",
+          "startup": 5,
+          "active": 13,
+          "recovery": 22,
+          "damage": 160,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 40,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            -12,
+            -192,
+            92,
+            145
+          ],
+          "cancel_start": 5,
+          "cancel_end": 24,
+          "cancels": [],
+          "rise": true,
+          "launch": true,
+          "chip": 12,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        }
+      },
+      "style": 0
+    },
+    {
+      "id": "emma",
+      "name": "EMMA",
+      "subtitle": "THE PRATT STREET PHANTOM",
+      "speed": 6,
+      "color": "#ff615d",
+      "moves": {
+        "lp": {
+          "name": "Pier Jab",
+          "startup": 3,
+          "active": 3,
+          "recovery": 7,
+          "damage": 45,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -132,
+            67,
+            34
+          ],
+          "cancel_start": 3,
+          "cancel_end": 12,
+          "cancels": [
+            "hp",
+            "lk",
+            "special1",
+            "special2"
+          ]
+        },
+        "hp": {
+          "name": "Alley Cross",
+          "startup": 7,
+          "active": 4,
+          "recovery": 13,
+          "damage": 100,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            20,
+            -135,
+            92,
+            44
+          ],
+          "cancel_start": 7,
+          "cancel_end": 17,
+          "cancels": [
+            "special1",
+            "special2"
+          ]
+        },
+        "lk": {
+          "name": "Check Kick",
+          "startup": 5,
+          "active": 4,
+          "recovery": 9,
+          "damage": 60,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -83,
+            91,
+            35
+          ],
+          "cancel_start": 5,
+          "cancel_end": 15,
+          "cancels": [
+            "hk",
+            "special1",
+            "special2"
+          ]
+        },
+        "hk": {
+          "name": "Neon Axe",
+          "startup": 10,
+          "active": 5,
+          "recovery": 16,
+          "damage": 130,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            20,
+            -146,
+            121,
+            90
+          ],
+          "cancel_start": 10,
+          "cancel_end": 21,
+          "cancels": []
+        },
+        "c_lp": {
+          "name": "Low Jab",
+          "startup": 3,
+          "active": 3,
+          "recovery": 7,
+          "damage": 40,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "mid",
+          "box": [
+            20,
+            -74,
+            68,
+            29
+          ],
+          "cancel_start": 3,
+          "cancel_end": 12,
+          "cancels": [
+            "c_hp",
+            "c_lk",
+            "special1",
+            "special2"
+          ]
+        },
+        "c_hp": {
+          "name": "Dock Upper",
+          "startup": 7,
+          "active": 5,
+          "recovery": 14,
+          "damage": 105,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            10,
+            -156,
+            65,
+            106
+          ],
+          "cancel_start": 7,
+          "cancel_end": 18,
+          "cancels": [
+            "special2"
+          ],
+          "launch": true,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "c_lk": {
+          "name": "Ankle Check",
+          "startup": 5,
+          "active": 4,
+          "recovery": 10,
+          "damage": 55,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "low",
+          "box": [
+            17,
+            -33,
+            92,
+            29
+          ],
+          "cancel_start": 5,
+          "cancel_end": 15,
+          "cancels": [
+            "c_hk",
+            "special1",
+            "special2"
+          ]
+        },
+        "c_hk": {
+          "name": "Brick Sweep",
+          "startup": 10,
+          "active": 5,
+          "recovery": 18,
+          "damage": 120,
+          "hitstun": 30,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "low",
+          "box": [
+            12,
+            -36,
+            126,
+            32
+          ],
+          "cancel_start": 10,
+          "cancel_end": 21,
+          "cancels": [],
+          "knockdown": true,
+          "launch_speed": 10.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "air_lp": {
+          "name": "Air Jab",
+          "startup": 4,
+          "active": 5,
+          "recovery": 9,
+          "damage": 50,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "overhead",
+          "box": [
+            15,
+            -123,
+            70,
+            44
+          ],
+          "cancel_start": 4,
+          "cancel_end": 15,
+          "cancels": []
+        },
+        "air_hp": {
+          "name": "Falling Hammer",
+          "startup": 7,
+          "active": 7,
+          "recovery": 13,
+          "damage": 105,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            12,
+            -117,
+            83,
+            63
+          ],
+          "cancel_start": 7,
+          "cancel_end": 20,
+          "cancels": []
+        },
+        "air_lk": {
+          "name": "Jump Check",
+          "startup": 5,
+          "active": 7,
+          "recovery": 10,
+          "damage": 65,
+          "hitstun": 16,
+          "blockstun": 7,
+          "pushback": 17,
+          "hitstop": 3,
+          "level": "overhead",
+          "box": [
+            13,
+            -82,
+            99,
+            49
+          ],
+          "cancel_start": 5,
+          "cancel_end": 18,
+          "cancels": []
+        },
+        "air_hk": {
+          "name": "Skyline Kick",
+          "startup": 8,
+          "active": 9,
+          "recovery": 15,
+          "damage": 120,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            12,
+            -94,
+            121,
+            61
+          ],
+          "cancel_start": 8,
+          "cancel_end": 23,
+          "cancels": []
+        },
+        "throw": {
+          "name": "Switchback",
+          "startup": 4,
+          "active": 2,
+          "recovery": 22,
+          "damage": 155,
+          "hitstun": 33,
+          "blockstun": 10,
+          "pushback": 65,
+          "hitstop": 5,
+          "level": "throw",
+          "box": [
+            0,
+            -130,
+            67,
+            130
+          ],
+          "cancel_start": 4,
+          "cancel_end": 12,
+          "cancels": [],
+          "launch": true,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 10.5,
+          "down_frames": 22,
+          "rise_frames": 14
+        },
+        "special1": {
+          "name": "Pratt Street Rush",
+          "startup": 6,
+          "active": 13,
+          "recovery": 17,
+          "damage": 120,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "mid",
+          "box": [
+            18,
+            -135,
+            88,
+            61
+          ],
+          "cancel_start": 6,
+          "cancel_end": 25,
+          "cancels": [
+            "special2"
+          ],
+          "travel": 7,
+          "chip": 8
+        },
+        "special2": {
+          "name": "Redline Vault",
+          "startup": 10,
+          "active": 10,
+          "recovery": 19,
+          "damage": 145,
+          "hitstun": 22,
+          "blockstun": 10,
+          "pushback": 30,
+          "hitstop": 5,
+          "level": "overhead",
+          "box": [
+            10,
+            -145,
+            104,
+            115
+          ],
+          "cancel_start": 10,
+          "cancel_end": 26,
+          "cancels": [],
+          "rise": true,
+          "travel": 4,
+          "launch": true,
+          "chip": 10,
+          "knockdown": true,
+          "launch_speed": 16.5,
+          "knockback_speed": 9.2,
+          "down_frames": 22,
+          "rise_frames": 14
+        }
+      },
+      "style": 1
+    }
+  ]
+}

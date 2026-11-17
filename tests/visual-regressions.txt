@@ -1,0 +1,6 @@
+PASS Two-frame backdrop returns to a pixel-identical first frame
+PASS Water visibly changes between the two background frames
+PASS Skyline, boat, dock, lamps, bollards and chains remain pixel-identical
+PASS Pause is pixel-identical across time, including fighters and rain
+PASS Resuming advances the fighters and weather again
+Failures: 0

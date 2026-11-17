@@ -1,0 +1,16 @@
+PASS Four generic names include Alex for the brown-haired male
+PASS Left wraps from Marcus to Emma
+PASS Right wraps from Emma to Marcus
+PASS Alex selection advances to opponent choice
+PASS Alex and Emma start a playable match
+PASS Legal special and matching sound for MARCUS
+PASS Correct defeat voice for MARCUS
+PASS Legal special and matching sound for MAYA
+PASS Correct defeat voice for MAYA
+PASS Legal special and matching sound for ALEX
+PASS Correct defeat voice for ALEX
+PASS Legal special and matching sound for EMMA
+PASS Correct defeat voice for EMMA
+PASS Rematch preserves Alex and Emma and resets scores
+PASS Prone pose does not flip when the opponent crosses over
+Failures: 0

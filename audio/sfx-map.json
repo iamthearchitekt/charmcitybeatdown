@@ -1,0 +1,160 @@
+{
+  "source": "User-supplied Street Fighter II / Super Street Fighter II CPS-1 SFX and Voices packs",
+  "base_path": "res://audio/sf2-cps1/",
+  "cues": {
+    "light_punch": {
+      "files": [
+        "13_attack_1.wav",
+        "19_attack_7.wav"
+      ],
+      "db": -12
+    },
+    "heavy_punch": {
+      "files": [
+        "14_attack_2.wav",
+        "15_attack_3.wav"
+      ],
+      "db": -10
+    },
+    "light_kick": {
+      "files": [
+        "16_attack_4.wav",
+        "1A_attack_8.wav"
+      ],
+      "db": -12
+    },
+    "heavy_kick": {
+      "files": [
+        "17_attack_5.wav",
+        "18_attack_6.wav"
+      ],
+      "db": -10
+    },
+    "special_hit": {
+      "files": [
+        "1D_attack_10.wav",
+        "1B_attack_9.wav"
+      ],
+      "db": -10
+    },
+    "throw_hit": {
+      "files": [
+        "1B_attack_9.wav"
+      ],
+      "db": -11
+    },
+    "block": {
+      "files": [
+        "22_attack_block.wav"
+      ],
+      "db": -13
+    },
+    "swing_light": {
+      "files": [
+        "5D_whoosh_2.wav"
+      ],
+      "db": -21
+    },
+    "swing_heavy": {
+      "files": [
+        "59_whoosh.wav"
+      ],
+      "db": -18
+    },
+    "projectile": {
+      "files": [
+        "5C_zap_2.wav"
+      ],
+      "db": -15
+    },
+    "rise": {
+      "files": [
+        "59_whoosh.wav"
+      ],
+      "db": -16
+    },
+    "rush": {
+      "files": [
+        "5D_whoosh_2.wav"
+      ],
+      "db": -17
+    },
+    "dash": {
+      "files": [
+        "5D_whoosh_2.wav"
+      ],
+      "db": -24
+    },
+    "jump": {
+      "files": [
+        "59_whoosh.wav"
+      ],
+      "db": -24
+    },
+    "land": {
+      "files": [
+        "12_thud_1.wav"
+      ],
+      "db": -24
+    },
+    "hard_land": {
+      "files": [
+        "12_thud_1.wav"
+      ],
+      "db": -15
+    },
+    "ko_land": {
+      "files": [
+        "1E_thud_2.wav"
+      ],
+      "db": -11
+    },
+    "ko_breakwater": {
+      "files": [
+        "27_male_ko.wav"
+      ],
+      "db": -7
+    },
+    "ko_redline": {
+      "files": [
+        "53_chunli_ko.wav"
+      ],
+      "db": -8
+    },
+    "menu_move": {
+      "files": [
+        "1C_clink.wav"
+      ],
+      "db": -21,
+      "group": "ui",
+      "min_interval_ms": 45
+    },
+    "menu_confirm": {
+      "files": [
+        "5B_zap_1.wav"
+      ],
+      "db": -15,
+      "group": "ui"
+    },
+    "menu_back": {
+      "files": [
+        "5C_zap_2.wav"
+      ],
+      "db": -20,
+      "group": "ui"
+    },
+    "pause": {
+      "files": [
+        "1C_clink.wav"
+      ],
+      "db": -23,
+      "group": "ui"
+    },
+    "round_start": {
+      "files": [
+        "57_metal_clang.wav"
+      ],
+      "db": -18
+    }
+  }
+}

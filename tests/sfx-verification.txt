@@ -1,0 +1,37 @@
+PASS All 21 active effects and KO voice WAVs import and decode
+PASS Playback pool is bounded to eight voices
+PASS One matching impact cue for lp
+PASS One matching impact cue for hp
+PASS One matching impact cue for lk
+PASS One matching impact cue for hk
+PASS One matching impact cue for c_lp
+PASS One matching impact cue for c_hk
+PASS One matching impact cue for special1
+PASS One matching impact cue for throw
+PASS Whiff produces one whoosh and no impact
+PASS Blocked contact produces block cue instead of damage cue
+PASS Projectile launch and delayed contact have distinct cues
+PASS Both sides of a simultaneous trade remain audible
+PASS Airborne KO does not prematurely play a floor thud
+PASS Airborne Redline defeat plays female scream immediately
+PASS KO landing produces exactly one body thud
+PASS KO voice does not repeat during landing or round-end frames
+PASS KO voice follows fighter identity in slot 0, kind 0
+PASS KO voice follows fighter identity in slot 1, kind 0
+PASS KO voice follows fighter identity in slot 0, kind 1
+PASS KO voice follows fighter identity in slot 1, kind 1
+PASS Drawn double KO has no match-loser scream
+PASS First round loss stays silent for slot 1
+PASS Early round loss keeps landing sound
+PASS First round loss stays silent for slot 0
+PASS Early round loss keeps landing sound
+PASS Timeout without knockout does not trigger a KO scream
+PASS Jump and touchdown cues fire once each
+PASS Hit variants alternate without altering pitch
+PASS Pause suspends all active combat audio voices
+PASS No new combat sound is started while paused
+PASS Pause menu feedback remains available
+PASS Resume releases paused sounds
+PASS Removed finisher cue cannot play
+PASS Rapid repeated impacts do not allocate unbounded players
+Failures: 0

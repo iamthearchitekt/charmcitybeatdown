@@ -1,0 +1,9 @@
+PASS Real audio driver starts imported effect playback
+PASS Active effect playback position remains frozen during pause
+PASS Resume restores active effect playback
+PASS Real audio driver plays ko_breakwater defeat voice
+PASS Real audio driver plays ko_redline defeat voice
+PASS Engine mix contains decoded, non-silent SFX audio
+PASS Overlapping effects retain headroom without digital clipping
+Peak sample: 28539
+Failures: 0

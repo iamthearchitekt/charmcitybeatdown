@@ -1,0 +1,66 @@
+CHARM CITY BEATDOWN - verification
+PASS Four selectable fighter appearances with two editable move sets
+PASS MARCUS full move kit and frame data
+PASS MAYA full move kit and frame data
+PASS ALEX full move kit and frame data
+PASS EMMA full move kit and frame data
+PASS QCF priority, facing 1
+PASS Dragon punch priority, facing 1
+PASS QCF priority, facing -1
+PASS Dragon punch priority, facing -1
+PASS Expired motion does not trigger a special
+PASS One active hitbox deals damage only once
+PASS Standing guard blocks mid
+PASS Standing guard blocks overhead
+PASS Low attack defeats standing guard
+PASS Crouching guard blocks mid
+PASS Crouching guard blocks low
+PASS Overhead defeats crouching guard
+PASS Throw defeats guard
+PASS Simultaneous active contacts trade
+PASS Heavy punch has readable startup
+PASS Whiffing attacks do not hit at a distance
+PASS Corner boundaries and pushbox separation
+PASS Jump-over side switch updates facing
+PASS Harbor Current projectile travels and hits once
+PASS Rising special catches airborne opponent
+PASS Redline advancing special closes distance and hits
+PASS Hitstop freezes simulation while accepting buffered input
+PASS Buffered normal cancel comes out after hitstop
+PASS LP into HP is a true short combo
+PASS KO awards the first round
+PASS Round transition restores health and resumes
+PASS Decisive round goes directly to results
+PASS Results remain stable without any finisher phase
+PASS Rematch clears score and preserves selected matchup
+PASS Down-release-down plus HP remains a normal punch
+PASS Airborne loser falls and settles on the dock after KO
+PASS Airborne winner also lands during round-end
+PASS Double KO grounds both defeated fighters
+PASS Double-tap 4 recognizes dash
+PASS Double-tap 6 recognizes dash
+PASS Forward dash travels faster than walking
+PASS Backdash creates room from close pressure
+PASS Timeout awards round to higher health
+PASS Double KO replays without awarding either player
+PASS Training regenerates health and never ends match
+PASS CPU selects legal moves and successfully fights across round resets
+PASS Normal CPU backs off and never walks into close pushbox pressure
+PASS Fighter 1 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 2 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 3 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 4 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS P1 keyboard light punch reaches live scene combat
+PASS P2 keyboard heavy punch reaches live scene combat
+PASS Right arrow moves Player 1 right
+PASS Left arrow moves Player 1 left
+PASS Down arrow crouches Player 1
+PASS Up arrow jumps Player 1
+PASS User-supplied match music plays at the requested increased level
+PASS Pause stops combat simulation
+PASS Pause freezes animation, rain, water and effects clock
+PASS Pause freezes both fighters' positions even in midair
+PASS Idle animation stays in hands-up boxing stances
+PASS Water background alternates exactly two frames at 4 fps
+Gamepad hardware: []
+Failures: 0
