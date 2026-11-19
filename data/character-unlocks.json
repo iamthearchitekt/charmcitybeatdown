@@ -1,0 +1,14 @@
+{
+  "master_code": "ALL",
+  "character_codes": {
+    "POE": "edgar-allan-poe",
+    "LMR": "lamar-jackson",
+    "REL": "orioles-mascot"
+  },
+  "character_names": {
+    "edgar-allan-poe": "EDGAR ALLAN POE",
+    "lamar-jackson": "LAMAR JACKSON",
+    "orioles-mascot": "ORIOLE BIRD"
+  },
+  "deferred_characters": []
+}

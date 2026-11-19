@@ -8,8 +8,9 @@ func check(ok:bool,label:String):
 	if not ok: failures+=1
 func run():
 	main=load("res://main.tscn").instantiate();root.add_child(main);await process_frame
+	main.set_process_input(false)
 	main.set_physics_process(false);main.selected_mode=1;main.begin_match()
-	for kind in 4:
+	for kind in main.sim.data.fighters.size():
 		main.sim.new_match(kind,kind);main.sim.phase="fight"
 		main.sim.fighters[0].x=330;main.sim.fighters[1].x=950
 		main.sim.step([{"up":true},{}])

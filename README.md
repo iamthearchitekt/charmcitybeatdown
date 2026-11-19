@@ -1,165 +1,192 @@
+Latest sprite/throw update: see ART_REVIEW.md for the reviewed female designs, grounded KO correction, 1,092 passing checks and remaining polish notes. FIGHTER_STYLE_PLAN.md is the requested next-step proposal only. Men's body proportions are unchanged by the female correction pass.
+
 # CHARM CITY BEATDOWN
 
-A playable Godot 4 one-on-one arcade fighter with original characters on Baltimore's Inner Harbor docks. Windows x64 build and complete editable GDScript source are included. The visual revision uses original generated raster sprite atlases and detailed painted-style harbor artwork. Effects, defeat voices and music come from user-supplied audio files.
+Collision update (#11): all fourteen fighters now use 463 pose-specific profiles baked from the final rendered sprite alpha. Multiple inset body regions preserve gaps between limbs; punch, kick and rising-attack regions follow the distal hand/boot/forearm instead of shared move rectangles. Walking, crouch, airborne, hit recoil, signature rotations and thrown-body rotation use the exact same deterministic pose selection as drawing. Facing, scale, sprite anchors and floor alignment are shared. Hitstop freezes pose selection. Active frames alone can strike; existing timings, damage, pushbox spacing and throw/grab rules remain. High kicks visibly above a crouched head can now whiff. Impact sparks use the actual contact point. F1 shows individual green hurt/red strike regions, plus blue movement pushboxes.
 
-## Visual revision
+Fighter contacts, projectiles and bonus strikes test individual regions. The six car objective bands remain. Keg hazards require contact with the visible central body, preserving the previous body-contact width; touching a prop with an attacking glove/boot does not itself damage the fighter. All fourteen fighters can clear all three bonus types through ordinary controls with the more accurate reach/height. Rebuild collision after art/anchor/scale changes: run `tools/export_collision_art.gd` in Godot, then Python `tools/bake_collision.py` (Pillow/NumPy). This writes `data/collision-profiles.json`; the simulation loads geometry only and never reads image pixels. Shared selector: `scripts/combat_pose.gd`; transforms: `scripts/collision_profiles.gd`. Focused checks: `tests/hitbox_verify.gd`, plus combat, throws, signature moves and all bonus/scoring suites.
 
-The roster now has four selectable appearances: **Marcus** and **Maya** are the original fighters, **Alex** is the white male with brown hair, and **Emma** is the white female with blonde hair. Marcus/Alex share the projectile and anti-air move set; Maya/Emma share the advancing pressure move set. Each has a complete 18-pose sprite set and matching portrait. Use Left/Right or click a fighter to choose from all four.
+HUD correction: scores, names and round markers now draw directly over the stage with no added black header/name panels or panel edge lines. Their aligned positions remain. All runtime text uses a slightly thicker shared black outline:4pixels below20pt,5pixels at20-47pt and7pixels at48pt+, each one pixel above the previous setting. Do not reintroduce filled score/name bars without an explicit request.
 
-All four grounded knockdown/KO poses lie face-up on their backs, with the head away from the opponent. Facing stays locked while down so the body cannot flip if the opponent crosses over. Nonfatal knockdowns recover through fixed crouch and guard poses; defeated fighters remain grounded.
+Latest presentation update: the fighting HUD groups scores above the health bars and names/round wins beneath them; bottom control instructions are removed. The pause screen still contains the full controls. Locked secret characters show only question marks on select, including preview names/art; the map uses WESTMINSTER. The level name appears only during the first-round introduction, with round numbers on subsequent intros.
 
-The initial geometric characters and flat stage have been replaced. Each fighter has 18 illustrated key poses for stance, movement, punches, kicks, crouching, jumping, guard, hit reactions, uppercut and KO. Idle animation stays in hands-up boxing stances. The stage has textured brick, an illuminated waterfront and a two-frame water loop at four frames per second. The skyline, boat, dock and props remain still; rain continues as a separate foreground effect. The title, character selection, portrait health bars and results screen use a unified arcade presentation. Fighters stand approximately 291 pixels tall (30% larger than the previous 224-pixel size) in a 720p viewport, with correspondingly enlarged collision geometry. Player 1 uses the arrow keys. Match music now uses the supplied Go Straight track at the increased volume.
+All fourteen fighters now have two dedicated stride/passing walking frames paced by distance traveled, replacing the old reused-idle walk sequence. All nine projectile users also have gathered-hands startup and two-handed Hadouken-style release poses. Their costumes, likenesses, heights and shared fine pixel/dither rendering are preserved. Sources are `assets/movement-a..d.png`, `data/movement-atlases.json`, `scripts/movement_art.gd` and `tools/register_movement.py`. The projectile origin moves forward to match the extended palms while retaining the common flight height. Poe's four-frame projectile uses a UV-violet palette; Spike keeps fire and other casters keep blue.
 
-## Movement and pace update
+Westminster / Poe's Grave is now **dark stormy daytime**, with gray overcast daylight, no moon, subtle two-state cloud lighting, the existing rain effect and intermittent crows. Keg/car/box points now credit the cumulative Arcade total live, show their subtotal and final payout, and survive returning to the ladder. Standalone bonus testing initializes a run before awarding points. Bonus completion and bookkeeping are idempotent. New checks cover all46 poses and real hit/clear/failure/next-fight score carryover.
 
-Regular jumps now use a dedicated tucked-leg, hands-up airborne pose for each fighter. Jumping kicks extend the leg only during the attack, then retract to the neutral jump pose; jumping punches have separate airborne punch artwork. For P1, **Up alone jumps; press C or V while airborne to kick**. P2 uses **W**, then **H or J**. Controller Up jumps, followed by the mapped kick button. These visual states do not change combat hitboxes or attack timing.
+A Windows/Godot 4.3 arcade fighter with fourteen characters, seven fighting stages and three rotating bonus challenges. Launch `Play.cmd` or the existing desktop shortcut. Keep `build/CharmCityBeatdown.exe` and its adjacent `.pck` together. Import `project.godot` in Godot 4.3 to work on the editable source.
 
-- Walk speed increased from 3.5 to 5.2 pixels/frame for Marcus/Alex, and 4.6 to 6.0 for Maya/Emma.
-- **Double-tap forward or back** for a quick dash/backdash. Dashes do not grant invincibility. You can attack out of the latter part of a dash.
-- Jumps travel faster with limited midair steering. Projectiles also move faster.
-- Attack startup is approximately 20% shorter, recovery approximately 26% shorter, and hitstop is 3 frames for light hits / 5 for heavy hits. Short combos remain supported.
-- Guard contact opens space. CPU opponents use short approach steps and pause/back off after two attacks instead of continuously crowding the player.
-- Knocked-out fighters continue falling during round-end and settle on the dock. Both fighters settle correctly after a double KO.
-- Pause freezes simulation, fighter animation, rain, water and effects. Resume continues from the frozen state.
+## Arcade campaign and combat update
 
-## Play on Windows
+Arcade now fights each eligible opponent once in a shuffled ladder. Spike is penultimate and Rachel is the final boss; Stan substitutes for a player Spike and Jeff for a player Rachel. Locked secret fighters join the opponent pool on the next run after redemption. Rachel's final fight raises CPU difficulty one step, capped at Hard. The first application-session fight remains Inner Harbor, later stages rotate without immediate repeats, and the same stage/music continues across rounds. A final result reaches a campaign-clear screen and saves the run.
 
-1. Double-click **Play.cmd** in this folder, or **build\CharmCityBeatdown.exe**. The included executable needs no Godot installation.
-2. Choose **Arcade**, **Local Versus**, or **Training** with Up/Down and Enter, or click a mode. On the title screen, Left/Right or the CPU button changes difficulty.
-3. Choose your fighter with Left/Right, press Enter, choose the opponent, and press Enter again.
-4. **Arrow keys control Player 1: Up jumps, Down crouches, Left/Right move.**
+Damage earns ten points per health point. Each won round adds remaining seconds times100, remaining health times10 and10000 for a perfect. Score persists across rounds, fights, bonuses and continues. Arcade losses show a ten-second Continue countdown after the results; continuing retries the same opponent and stage. Expiry ends the run. The main menu's HIGH SCORES retains the top ten scores, fighter names, clear status and continue counts in `user://arcade-high-scores.cfg`. Training does not earn scores. Local Versus stays separate.
 
-**Go Straight** plays during matches at -13 dB. It stops on the KO frame before the defeat scream, and restarts for the next round. **Level Complete** plays once when the results screen opens, after the KO presentation ends. Rematching or returning to the title stops that clip. N toggles menu and match music; M mutes all audio. F11 toggles fullscreen. Esc pauses and shows both move lists. Close the window to quit.
+Press keyboard2 or the second controller's Start during an active solo fight for NEW CHALLENGER. Player2 selects a fighter and plays a separate local Versus match. The result returns to the suspended Arcade fight with its health, timer, opponent, stage, score and ladder position intact. Canceling challenger selection also resumes the fight. Start accepts Continue/result screens; ordinary face-button confirmation remains supported.
 
-## Sound update
+Unblocked strikes build hidden dizzy pressure; blocked attacks and throws do not. At300 points the victim is knocked down, then gets up temporarily dizzy with three outlined orbiting pixel stars. Neutral recovery takes three seconds; distinct directional changes/attack taps shorten it to no less than one second. Holding one direction does not repeatedly accelerate recovery. A hit or throw ends dizzy, and a short protection interval prevents an immediate repeat. Pressure decays after90 simulation frames without a hit. These are original balance values, not a claim of exact SFII frame data. CPU recovery is bounded too.
 
-The main menu and character selection play the supplied **Never Return Alive** track at -13 dB. It cuts immediately when a match starts, before **Go Straight** begins; returning to the title restarts it. Every screen uses bundled **Upheaval Pro** for headings, fighter names, HUD, controls, move lists and buttons; the title screen no longer displays the fighter sprites, their name labels, or the Baltimore / After Midnight tagline.
+Opposing blue/fire projectiles now cancel each other before checking fighter contacts, with a compact pixel burst and the supplied special-impact sound. Same-owner shots and different-height shots do not cancel. Relative-motion checks catch shots crossing within a step. Clashes add no global hitstop.
 
-21 active imported WAVs provide distinct punch/kick impacts, blocking, attack whooshes, specials, movement, landings, menus and defeat voices. Marcus and Alex use `27_male_ko.wav`; Maya and Emma use `53_chunli_ko.wav`. A defeat scream plays once only when a fighter is knocked out in the match-deciding round. Earlier round losses and drawn double KOs have no scream; body thuds still follow the actual landing. Combat audio pauses with the game. See `audio/SFX-MAPPING.md` for the source mapping and `audio/sfx-map.json` to adjust effects levels or replace clips.
+After every two Arcade wins, except the final boss, bonuses rotate **Fells Point car -> Brewers Hill kegs -> Dundalk boxes**, then repeat. All use30-second timers, visual damage and secret-code rewards for complete destruction. Brewers Hill is a new nighttime brewery stage with **no people**; the second frame only dims the Natty Boh neon tubes slightly and changes their red pavement reflection. Architecture and camera stay identical. Twelve kegs drop from alternating sides, bounce and cross the lane; every keg must be broken. Dundalk has ten separately destructible stacked wooden shipping boxes whose unsupported upper boxes fall. Jumping, high/low attacks and specials work; throws do not damage props. No prop health bars or attack-instruction overlays.
 
-## Knockdowns and final KO
+Code: `scripts/arcade_run.gd`, `scripts/breakables_bonus.gd`, `scripts/dizzy_stars.gd`, plus combat/main/stage integration. New art: `assets/brewers-hill.png`, `assets/breakables-atlas.png`, metadata generated by `tools/register_breakables.py`. Tests: `dizzy_clash_verify.gd`, `arcade_run_verify.gd`, `breakables_verify.gd`, `arcade_visual_verify.gd`, plus the updated stage/solo and existing combat/car/music suites.
 
-The announcer now says **Fight!** at each round start. Only the final match loss triggers a defeat scream. Results then announce **You win!** or **You lose!** from Player 1's perspective in Arcade; Local Versus uses **You win!** for the named winner. The results screen contains no fighter sprites or match HUD: logo, winner, score and buttons are centered. Completion music ducks briefly for the announcement and returns to normal afterward. Rematch/title exit cuts the announcement immediately.
+**LMR** now unlocks Lamar Jackson in a purple/black Ravens football uniform, correct white number **8**, braids, uncovered face and no helmet. He has all 22 gameplay poses and separate victory/defeat portraits in `assets/lamar-atlas.png` and `assets/results-portraits-g.png`. Walking speed7.2 is the fastest in the roster, and an optional per-fighter dash multiplier gives him 12% quicker forward/back dashes. Standard damage and health remain. Register with `tools/add_lamar.py`, `tools/register_throw_atlases.py` and `tools/register_results_portraits.py`. Jersey verification: https://www.baltimoreravens.com/team/players-roster/lamar-jackson/ . The seven-column/two-row roster now fills all fourteen slots; large preview names resize to fit without clipping.
 
-Throws, sweeps and launchers send the victim backward using a fixed airborne hit pose, then onto the dock for 22 frames before a 14-frame recovery. A sweep uses a lower arc. Jump launch velocity is now 25.5 pixels/frame, rising knockbacks use 16.5, and sweeps use 10.5; backward knockback speed is 9.2, or 10.5 for throws. Knockdown and get-up artwork uses fixed key poses without sprite rotation or scaling animation. Airborne hits and lethal hits also cause a knockdown. Grounded jabs and ordinary punches preserve standing hitstun and short combos. Prone/recovering fighters cannot be hit until they regain control; defeated fighters stay down. Knockback speed, launch speed, grounded duration and recovery duration can be edited per move in `data/moves.json` (`knockback_speed`, `launch_speed`, `down_frames`, `rise_frames`, `knockdown`).
+**REL** now unlocks the playable Oriole Bird. His complete 22-pose atlas includes wing punches, orange-foot kicks, separate jumps, four throws and a face-up KO, plus two dedicated result portraits. His presentation scale is 1.1235, exactly Stan's. All art uses the shared fine pixel/dither pipeline. The thirteen-fighter select screen uses seven columns and two rows with enough clearance for the large previews. Reproduce registration with `tools/add_oriole.py`, `tools/register_throw_atlases.py` and `tools/register_results_portraits.py`. Source sheets: `assets/oriole-bird-atlas.png`, `assets/results-portraits-f.png`.
 
-The match-winning KO uses 0.8 seconds at quarter speed followed by 0.4 seconds at half speed, then resumes normal speed. Fixed 60 Hz combat steps are scheduled less frequently during this presentation; move frame data is unchanged. The defeat scream keeps its normal playback rate. Pause freezes slow motion too. Timeouts and non-decisive rounds do not trigger it.
+Every fighter has separate enlarged victory and bruised defeat portraits on the post-fight results screen. Women use playful confident gestures; men use power poses. All pass through the same fine pixel/dither treatment. Rachel's badge is removed from every gameplay and result pose; Rachel and Jeff's result faces follow the supplied reference photos. Sources are `assets/results-portraits-a..e.png`, `data/results-portraits.json`, `scripts/results_portraits.gd` and `tools/register_results_portraits.py`.
 
-## Default controls
+Enter **POE** in the main-menu cheat-code screen to unlock Edgar Allan Poe. He is pale, dressed in black Victorian garb, lanky and the same height as Spike, with all 22 ordinary/jump/throw/KO poses. Westminster / Poe's Grave joins the random stage rotation after the first Inner Harbor fight. One fixed painting supplies two subtle light states; separate two-frame crows cross overhead intermittently, alternating direction with long quiet gaps, and freeze on pause. Registration: `tools/add_poe.py`, then `tools/register_throw_atlases.py` and `tools/register_results_portraits.py`. Historical references: Westminster Hall's official history and the Library of Congress Poe portrait collection.
 
-| Action | Player 1 | Player 2 | Xbox-style controller |
+The car stage now gives **30 seconds** and omits attack instructions, jump hints and control prompts. Its timer, score, code reward and navigation remain visible.
+
+The title screen displays the stage painting without the former 49% dark overlay. Title/menu music is -11 dB, a restrained 2 dB increase; stage music remains -13 dB.
+
+Inner Harbor opens the first fight in each application session. Later fights randomize without immediate repeats; round transitions and returning to the menu do not reset the opener. A small two-pose rat runs along the Inner Harbor foreground, pauses twice and resumes, then returns from the opposite edge. It uses the paused stage clock and is absent from other stages and the title screen. Rat sources/registration: `assets/harbor-rat-source.png`, `tools/register_harbor_rat.py`, `scripts/harbor_rat.gd`.
+
+Stan's presentation scale is now 1.1235, exactly 5% above his former 1.07; Jeff remains tallest. Selection movement now uses the short `5B_zap_1.wav` at -22 dB, with a distinct `5E_zap_3.wav` confirm at -18 dB. Round intros sequence the supplied ROUND and number clips before FIGHT; rounds 1-9 are supported, with FINAL ROUND after that. The 150-frame intro leaves 110 frames for the call. A separate Hadouken voice fires once when an actual plasma projectile spawns, alongside the energy effect.
+
+## Signature kick attacks
+
+The approved new moves are implemented with 28 dedicated source poses across three sheets and the existing fine pixel/dither pipeline. All original moves, costumes, portraits, throws and KO poses are retained. New attacks use bounded multi-hit intervals, ordinary guarding, limited chip, recovery and existing KO follow-through. CPU opponents can use them with the existing reaction delays. Physical Sega controls are shown in the pause move list; keyboard kick bindings trigger the same commands.
+
+| Fighter | Move | Sega input |
+|---|---|---|
+| Vivian | Blossom Lightning: rapid kick flurry | Tap X or C three times quickly |
+| Vivian | Sakura Whirlwind: inverted spinning bird kick | Hold Down, then Up + X or C |
+| Alex | Grey Cyclone: traveling upright hurricane kick | Roll Down to Back, then X or C |
+| Brook Lynne | Orange Blitz: kick flurry | Tap X or C three times quickly |
+
+Vivian keeps her black pigtails, cherry-blossom outfit, pink skirt over white leggings and stronger/faster kit. Her spinning poses are actually inverted rather than reused standing kicks. Alex retains his grey sleeveless hood-down hoodie, white wraps, charcoal pants and brown boxing boots; Brook Lynne retains deep brown skin, wavy high ponytail and orange/black/white outfit. `tools/add_signature_moves.py` and `tools/register_signature_art.py` reproduce registration. `signature_art.gd` stores the extra cached textures separately from the original atlas cache. Tests: signature mechanics33 and graphical28.
+
+Spike's Iron Pulse now renders as an orange/red four-frame fireball with a bright hot core. Other fighters' plasma balls retain the original blue effect. Damage, speed, hitboxes and lifetime are unchanged. Art sources and registration: `assets/spike-fire-source.png`, `tools/register_spike_fire.py`; four 46x28 frames render through `arcade_projectile.gd`. The supplied hurricane-kick and spinning-bird-kick voice clips accompany the new special animations at restrained gain.
+
+## Fells Point car bonus
+
+Latest polish: character select uses a Baltimore City boundary/harbor map with local stage markers. Fighter shadows are shallow pixel contacts aligned to the opaque soles; the old mirrored reflections and offset discs are removed. Eric is scaled to .985 (Spike 1.0), approximately 5% larger than his former .94 scale, preserving his broader build. Fells Point spectators wear contemporary clothing and have a two-source-pixel upper-body second pose. Car health bars are removed; damage artwork is the progress display. Bonus jumping is reduced to 28.5 vertical launch / 10.2 horizontal speed, with a shaped roof/fender obstacle.
+
+Block grunts are now -15 dB plus mix headroom, with small per-file balancing, a protected playback voice and a four-dB music duck while a grunt plays. The four stage tracks use prepared Ogg loops from `audio/loops`, with recorded ending fades removed and a two-second join. `tools/build_music_loops.py` reproduces these files from the preserved original MP3s using ffmpeg/NumPy. Loop points are recorded beside them. Playback stays continuous between rounds and still stops at whole-fight completion.
+
+Arcade progression offers a rotating bonus after every two won matches (not individual rounds): car, kegs, boxes. Continue from the result screen to enter it, then return to the next opponent in the finite ladder. Versus and Training retain their ordinary flow. A fresh Arcade run resets the match counter.
+
+The front-facing silver sedan has **six independent hit zones, three on each side**. Top/glass takes punches or high kicks; middle/hood takes crouching jabs; bottom/bumper takes crouching kicks. Each zone shows four registered damage states, local impact shake and fragments. A high attack cannot spill into a lower target. The car blocks grounded movement. Up plus direction crosses it in either direction; normal fighting movement is unchanged.
+
+Destroy all six zones within **30 seconds** to reveal an existing three-character unlock password. Five zones or a timeout do not earn a code. New reward codes are preferred until all three have been revealed; results are saved separately from redeemed unlocks. Enter the code through the main-menu CHEAT CODE option. Poe, the Oriole Bird and Lamar Jackson are all playable after unlocking.
+
+Fells Point uses one fixed painting with exactly two states at four frames per second. Existing upper lights, warm cobblestone reflections and spectators' upper bodies change; architecture, signs, feet and camera stay fixed. **Alien Power** plays throughout the challenge. Supplied CPS-1 sounds: `57_metal_clang.wav` for impacts, `58_break_glass.wav` for destroyed glass, `24_break_metal.wav` for destroyed hood/bumper, and a restrained metal/glass layer for the final wreck.
+
+New implementation: `scripts/car_bonus.gd`, `scripts/bonus_car.gd`, `scripts/bonus_rewards.gd`. Art registration: `tools/register_bonus_car.py` preserves the common canvas and wheel baseline, using the shared fine raster/dither parameters. Verification: `tests/car_bonus_verify.gd` (80 checks), `tests/car_bonus_visual_verify.gd` (6 graphical checks), existing core (77), solo selection (32) and SFX (36).
+
+## Roster
+
+| Fighter | Appearance | Availability |
+|---|---|---|
+| Marcus | Original navy/orange dockworker | Available |
+| Brook Lynne | Black woman, long black high ponytail, fuller lips and berry lipstick; orange/black/white outfit | Available |
+| Alex | Medium athletic build, brown hair and fuller trimmed beard, gray sleeveless hood-down hoodie vest, charcoal training pants, brown boxing boots, white boxing wraps | Available |
+| Lauren | Fair-skinned blonde with side braid and purple cropped jacket | Available |
+| Chelsea | Straight orange-red hair; green/black outfit | Available |
+| Vivian | East Asian woman with black pigtails, light-pink skirt over white leggings and cherry-blossom details | Available |
+| Spike | Reference-matched bald face, dark brows and short dark beard; subtle eye scar, spiked black leather jacket, black jeans and mid-calf combat boots | Available |
+| Eric | Shorter stocky build, long wavy brown hair and full beard; white/red/black racing suit | Available |
+| Stan | Taller muscular build, full black beard and small black bun; black/red/white racing suit | Available |
+| Rachel | Brown bun and glasses, fitted dark tactical field-agent outfit; strongest female damage kit | Available / boss |
+| Jeff | Tallest, lanky with subtle athletic muscle; glasses, black BSE bomber jacket, jeans, boots and fingerless gloves | Available |
+| Edgar Allan Poe | Pale, lanky at Spike's height; black Victorian frock coat, waistcoat, white collar and cravat | POE code |
+| Oriole Bird | Black/orange mascot, orange beak/feet, black cap with orange brim; Stan's size | REL code |
+| Lamar Jackson | Recognizable helmet-free likeness, purple Ravens number8 jersey, black padded pants and cleats; fastest walking speed and quicker dashes | LMR code |
+
+Women have athletic feminine proportions, slim waists and upper bodies, fuller hips and proportionate thighs. Vivian moves slightly faster and deals approximately 8% more damage than the other women. Alex's walking speed is 6.2 versus Marcus/Spike 5.2, about 19% faster; health and damage are unchanged. Each playable fighter has 18 ordinary keyed poses and four dedicated throw poses, including separate neutral jump, airborne punch and jumping kick. Every KO lies face-up on the back, with the head away from the opponent and facing locked while grounded. Marcus's high-kick artwork has corrected anatomy.
+
+All poses and portraits use one cached raster: 0.9 logical units per texel, about 178 native pixels for standing fighters (Alex is slightly smaller), nearest enlargement, hard alpha edges, 23 channel steps and subtle fixed 4x4 Bayer dithering. Original source atlases are preserved. Revised female atlases load raw PNG bytes; `data/female-atlases.json` supplies registered bounds/pivots. `tools/register_female_atlases.py` reads alpha to regenerate metadata without editing art; it needs Python, Pillow and NumPy. Rim cleanup removes bright baked directional lighting while preserving costume colors and berry lipstick.
+
+## Sega controls
+
+The primary Retro-Bit Sega layout also applies when Windows calls the pad a generic XInput device. Saved custom profiles take precedence. Other secondary pads retain standard Xbox controls unless identified as Retro-Bit.
+
+| Action | Sega pad | P1 keyboard | P2 keyboard |
 |---|---|---|---|
-| Left / right | Left / Right arrows | A / D | D-pad or left stick |
-| Jump / crouch | Up / Down arrows | W / S | Up / Down |
-| Dash / backdash | Double-tap Right / Left (relative to facing) | Double-tap D / A (relative to facing) | Double-tap forward / back |
-| Light punch (LP) | Z | F | X |
-| Heavy punch (HP) | X | G | Y |
-| Light kick (LK) | C | H | A |
-| Heavy kick (HK) | V | J | B |
-| Throw | B | R | LB |
-| Pause / resume | Esc | Esc | Start |
+| Move / jump / crouch | D-pad | Arrows | WASD |
+| Light punch | A | Z | F |
+| Heavy punch | B | X | G |
+| Light kick | X | C | H |
+| High kick | C | V | J |
+| Throw | Y | B | R |
+| Pause / resume | Start | Esc | Esc |
+| Menu confirm / back | A / B | Enter / Esc | Enter / Esc |
 
-The first connected controller drives Player 1 and the second drives Player 2. Keyboard and controllers can be mixed; keyboard input remains active. Default controller A confirms menus and B returns. D-pad and left stick both navigate menus. Shared keyboard rollover depends on your hardware; two controllers avoid keyboard ghosting.
+Genesis C is handled through Godot's normalized right-trigger axis. Holding an attack does not repeat it; release and press again. Controller setup (F4) supports buttons and axes, saves per controller identity, rejects duplicate gameplay bindings and preserves keyboard bindings. Canceling setup preserves the previous profile. Pair the controller in Windows before launching. Controller verification uses synthetic events; physical Bluetooth operation remains a hands-on check.
 
-### Sega Bluetooth controller setup
+The pause menu presents a **SEGA MOVE LIST** with physical button labels and plain D-pad instructions. Forward means toward the opponent. For the first special, roll DOWN through DOWN-FORWARD to FORWARD, then press A or B. For the uppercut/rising special, press FORWARD, DOWN, DOWN-FORWARD and A or B. Hold BACK to guard; DOWN + BACK guards lows. Throws beat guard. Press Y close to grab, lift over the shoulder and toss. Hold BACK + Y for a back throw. Throws cannot grab airborne fighters, protected wake-ups or opponents out of range. UP jumps; X or C while airborne kicks. Double-tap forward/back to dash/backdash. Holding back takes one short step, then blocks in place until released.
 
-1. Pair your controller in Windows **Settings > Bluetooth & devices**, then launch the game. If Windows does not expose it as a game controller, use the pad manufacturer's Windows-compatible mode and pair again.
-2. Click **Controller Setup** on the title screen or press **F4** from any screen. During a match this pauses the game.
-3. Press any button on the pad you want to configure, then follow the 12 prompts. Release each control before entering the next. Directions can be buttons or axes, and attacks can also use axis-backed buttons.
-4. Suggested six-button Sega layout: **X = light punch, Z = heavy punch, A = light kick, C = heavy kick, Y = throw, Start = pause**. Set **A = menu confirm** and **B = menu back** in the last two prompts. Physical labels are captured directly; the game does not guess Windows button numbering.
-5. When it says **Saved**, press **Esc** to close setup. If you opened it during a match, press mapped **Start** or Esc to resume.
+N toggles music, M mutes all audio, F11 toggles fullscreen, and F also toggles fullscreen on the title screen. Keyboard F remains P2's light punch during fights. The seventh main-menu entry, **QUIT GAME**, exits via mouse, keyboard or controller.
 
-Only controller settings change: **P1 arrows / Z X C V B and P2 WASD / F G H J R remain exactly as before**. Complete mappings are saved per controller identity in `%APPDATA%\Godot\app_userdata\CHARM CITY BEATDOWN\controllers.cfg`. Identical models share a mapping. Esc cancels an unfinished mapping without replacing the old one. Reconnects restore the saved mapping and player slot; disconnecting a player controller pauses a match without moving the other controller to a different player. To remap again, reopen F4.
+## Passwords and unlocks
 
-No controller was connected during this run. The custom mapping path is tested with synthetic Godot controller events; the actual Bluetooth connection and your pad's reported buttons still need a hands-on check.
+Choose **CHEAT CODE** on the main menu. Three slots accept letters/numbers. Keyboard: type, Backspace clears, Enter redeems, Esc returns. Pad: Up/Down cycles characters, Left/Right changes slot, A redeems, B returns. Unlocks persist in the local save.
 
-## Combat and commands
-
-Hold **away from your opponent** to block. Stand guard blocks mids and overheads; crouch guard blocks mids and lows. Throws beat guard. Jumping attacks are overheads. Crouching kicks are lows. Standing heavy kicks are overheads. Air blocking is unavailable.
-
-Directions are relative to your current facing: **6 = forward, 4 = back, 2 = down, 8 = up, 3 = down-forward, 5 = neutral**. P means either punch. Enter motions within about 0.4 seconds. Specials take priority over normals. Attack inputs buffer for six simulation frames, including hitstop. Cancel routes require contact; recovery remains punishable on a whiff.
-
-| Fighter | Command | Move | Function |
-|---|---|---|---|
-| Marcus / Alex | 236 + P | Harbor Current | Mid projectile |
-| Marcus / Alex | 623 + P | Breakwater Rise | Rising anti-air; punishable recovery |
-| Marcus / Alex | Throw | Mooring Toss | Close-range guard-beating throw |
-| Maya / Emma | 236 + P | Pratt Street Rush | Fast advancing pressure |
-| Maya / Emma | 623 + P | Redline Vault | Advancing overhead rising strike |
-| Maya / Emma | Throw | Switchback | Close-range guard-beating throw |
-
-**Player 1, facing right:** Harbor Current / Pratt Street Rush = Down, Down+Right, Right+Z (or X). Rising special = Right, Down, Down+Right+Z (or X). Reverse Left/Right when facing left.
-
-All four fighters have LP, HP, LK, HK, four crouching attacks, and four jumping attacks. Normal move names and precise frame data are in `data/moves.json`.
-
-Practical close-range routes, with `>` meaning cancel after contact:
-
-- Both: LP > HP > 236 P.
-- Both: LK > HK, or crouching LK > 236 P.
-- Marcus / Alex: crouching LP > crouching HP > 623 P.
-- Maya / Emma: LP > HP > 236 P > 623 P.
-
-The first player to win two rounds wins the match. Each round lasts 99 simulation seconds; hitstop pauses the timer. Timeouts award the round to the fighter with more health. Draws and double KOs replay the round without awarding a win.
-
-After the match-winning KO, the defeat scream and brief slow-motion presentation play, followed directly by the results screen and completion music. There is no finishing move, command, or extra input window. Enter rematches the selected matchup; Esc returns to the title.
-
-## Training
-
-- **F2:** cycle stand, crouch, standing guard, crouching guard.
-- **F3:** reset positions and health.
-- **F1:** show hurtboxes (green), pushboxes (blue), active hitboxes (red).
-- Input history shows newest input first, in facing-relative numeric notation.
-- Health regenerates between exchanges; the timer and match endings are disabled.
-
-## Source and extension
-
-Open `project.godot` in Godot 4, then press **F5**. This build was implemented and tested with Godot 4.7.2. `Launch.ps1` finds the installed Godot on PATH and can launch the source if the executable is absent. Node.js is needed only to regenerate the optional procedural assets.
-
-| File | Purpose |
+| Code | Unlock |
 |---|---|
-| `scripts/combat.gd` | Fixed 60 Hz combat, collision, guard rules, trades, rounds, results |
-| `scripts/commands.gd` | Direction history, motion recognition, input priority |
-| `scripts/controller_bindings.gd` | Separate saved controller profiles, button/axis bindings and player slots |
-| `data/moves.json` | Fighter definitions and editable frame data |
-| `scripts/cpu.gd` | Delayed, range-sensitive legal-move CPU |
-| `scripts/main.gd` | Menus, controls, HUD, audio and effects |
-| `scripts/sfx_bank.gd` | Bounded, pause-aware effect and KO voice playback |
-| `audio/sfx-map.json` | Editable source WAV routing, variants and levels |
-| `scripts/harbor_stage.gd` | Painted Inner Harbor stage, two-frame water shader and separate rain |
-| `scripts/fighter_sprites.gd` | Atlas regions, pivots, pose animation and portraits |
-| `data/appearance-atlases.json` | New sprite regions and original fighters' face-up KO artwork |
-| `assets/` | Original generated fighter atlases, harbor artwork and title logo |
-| `tools/build-assets.cjs` | Reproducible original WAV synthesis and initial move table generator |
-| `tests/verify.gd` | Automated combat and scene-input checks |
+| ALL | All current and future registered characters |
+| POE | Edgar Allan Poe - playable unlock |
+| LMR | Lamar Jackson - playable unlock |
+| REL | Oriole Bird - playable unlock |
 
-Combat timing is independent of visual animation. Contacts are collected before applying damage, so simultaneous hits trade. Each move/projectile can hit a target once. Attack-facing locks during moves, while neutral facing updates after side switches. Fighter geometry uses a common 1.82 scale; the jump arc supports crossing over the larger opponents.
+All three secret characters are fully playable after unlocking. No designs remain deferred. See `data/character-unlocks.json` and `scripts/character_unlocks.gd`.
 
-Edit `moves.json` directly to tune attacks. **Running `node tools/build-assets.cjs` regenerates that JSON and overwrites manual move edits.** To re-export elsewhere, set the Windows export template paths in `export_presets.cfg` to your installed Godot templates (or clear the custom paths to use your standard installation).
+## Modes and combat
 
-Run the verification suite from this folder with your Godot console executable:
+Arcade selects a random different available CPU opponent for every new match/rematch and keeps that opponent between rounds. Versus and Training use manual selection. The roster matrix has seven columns and two rows for fourteen fighters: the original eleven are available immediately; Poe unlocks with POE, the Oriole Bird with REL, and Lamar with LMR. Rachel is marked BOSS and deals 22% more damage than the standard female kit, above Vivian; her health remains 1000 and her build stays proportionate. Jeff is tallest with subtle athletic muscle. Lamar's walking speed7.2 exceeds Jeff/Vivian6.4, with standard health/damage. Locked characters are skipped until unlocked. Training: F1 boxes, F2 dummy mode, F3 reset. Health regenerates and match endings are disabled in Training.
+
+Combat runs at a fixed 60 Hz, independently of visual animation. Attack-facing locks through moves; neutral facing changes after side switches. Contacts are snapshotted before damage for simultaneous trades. Each move/projectile hits each target only once. Jumping attacks are overheads; crouching kicks are lows; standing high kicks are overheads. Uppercuts rise higher and launch farther with one small ground bounce.
+
+The CPU observes executed attacks, learns after three repetitions, sometimes guards through hitstun or punishes recovery, and forgets after inactivity. It retains reaction delays, spacing pauses and imperfect decisions. A winning attack completes its active motion/recovery after KO; new attacks and contacts are suppressed. MAKE IT COUNT has been removed from fight announcements.
+
+## Stages
+
+The first fight after each application launch opens at Inner Harbor. Later stages rotate randomly without consecutive repeats and remain fixed between rounds. Each animated backdrop reuses one painting and exactly two fixed shader states. Architecture and camera do not drift.
+
+| Stage | Two-frame animation |
+|---|---|
+| Inner Harbor Docks | Subtle water change; separate foreground rain |
+| Dundalk / Seagirt Marine Terminal | Water, stack smoke and a warmer second-frame Domino Sugars sign glow; separate rain |
+| Graffiti Alley / Bromo Tower | Visible blue clock pulse, puddle highlight and complementary window twinkles; no rain |
+| Eutaw Street / Camden Yards | Fine crowd pixelation and a subtle two-pixel upper-body cheer; fixed warehouse, carts, smoke, gates and plaques |
+| Power Plant Live! / UPC | The same fine crowd treatment/cheer, subtle sign glow and reflected-light changes; fixed storefronts, lettering, planters, pole and horizontal barricade rails |
+| Westminster / Poe's Grave | Subtle warm window/lantern glow and reflected light; fixed church, graves, lettering and camera; separate intermittent two-pose crow flyovers |
+
+Eutaw and Power Plant crowds use a two-source-pixel grid and 31 channel steps. Power Plant includes POWER PLANT LIVE!, PBR Baltimore, UPC / Underground Pizza Company and Angels Rock Bar signage. Pause freezes stages and gameplay.
+
+GPU comparisons: Dundalk sign changes 5,660 pixels, outside allowed regions 0, overall mean RGB difference .01694. Graffiti changes 2,639 clock pixels, 1,617 puddle pixels and 1,324 windows, outside 0, mean .03454 (stronger than the rejected barely visible version). Power Plant crowd styling affects 122,074 pixels and cheering changes 53,391; outside allowed regions and rail changes are 0; light-only mean .01198.
+
+## Presentation and audio
+
+The Windows icon is the cracked gold C from the logo with a red slash behind it. `assets/game-icon.png` is a transparent freeform PNG, with no tile/backplate. `assets/charm-city-beatdown.ico` includes 16, 20, 24, 32, 40, 48, 64, 96, 128 and 256px frames. Project/window/taskbar settings and the export preset point to these assets. Both Windows EXEs have matching native icon resources; the existing desktop shortcut inherits the main EXE icon. ICO storage uses transparent padding without changing the PNG's proportions.
+
+`tools/build_icon.py` encodes the PNG into ICO. On Windows, run `tools/apply_windows_icon.py` after replacing/re-exporting either EXE; it stages and verifies native icon resources without an external resource editor. PCK files must remain external. `tools/verify_windows_icon.py --shortcut "<path-to-shortcut>"` checks the Windows shell and the running game's icons. A normal PCK-only repack retains the EXE icons. Standard Godot 4.3 editor exports additionally need their Windows resource-editor configuration when `application/modify_resources` is enabled.
+
+Street Fighter II-inspired selection uses a blue world map, large inward-facing fighters, a central portrait matrix and P1/P2 cursors. Spike/Lauren portrait crops include the complete head. UI has fine fixed grain, stepped arcade frames, dithered gold life bars, a red timer and a triangle cursor. Maroon selection/confirmation fills are removed; empty health is charcoal. Text has one black outline, rounded coordinates and no offset shadow: 3 pixels for small text, 4 for normal UI, 6 for announcements. Fight/round/KO banners sit roughly 80 pixels higher to leave standing fighters visible. The logo uses a detailed 512-pixel-wide dithered raster.
+
+Original four-frame pixel hit/block bursts replace the colored line wheel. The blue projectile is an original four-frame pixel fireball with a bright rounded core and trailing flames. Nearest sampling and hard alpha preserve the arcade aesthetic; pause freezes effects. These visual revisions preserve existing collision and timing.
+
+Music is assigned in `data/music.json`. The Street of Rage is the new title/menu song. Alien Power plays at Graffiti Alley; Back to the Industry plays at Dundalk; the former title track Never Return Alive now plays at Power Plant Live!. Inner Harbor and Camden Yards keep Go Straight. Stage music loops continuously across rounds at -13 dB, stopping only when the whole match is decided. Cached raw MP3 streams allow the supplied files to work without editor imports. Level Complete plays once on results.
+
+Defeat screams play on every defeated round, including double KOs. A match-ending knockout plays the user-supplied final male/female WAV exactly ONCE; its echo is already baked into the file. There is no generated echo or repeat queue. Earlier round losses retain one original short scream. The female victory taunt follows the full final KO clip when a female CPU beats the player; results music/announcer wait until voice/taunt finish. Block contacts randomly select one of two grunts for the defender's male/female voice group, at a restrained -23 dB cue gain plus -1 dB mix headroom. All voices freeze during pause and clear on rematch/title exit. Timeouts without a knockout do not scream. Landing thuds follow actual landings. `audio/sfx-map.json` controls source WAV routing and base levels. There is no finishing-move phase.
+
+## Source and verification
+
+Key source files: `scripts/combat.gd` (simulation), `commands.gd` (motions), `cpu.gd`, `controller_bindings.gd`, `main.gd` (UI/audio), `fighter_sprites.gd`, `harbor_stage.gd`, `arcade_ui.gd`, `impact_sparks.gd`, `arcade_projectile.gd`, `character_unlocks.gd`, `data/moves.json` and `data/female-atlases.json`.
+
+Run pure simulation tests headlessly with Godot 4.3. GPU suites waiting on `RenderingServer.frame_post_draw` must run with a graphics driver. Tests cover combat, legal inputs, controllers, solo opponents, roster, all-pose pixel consistency, face-up KOs, jumps, sound, continuous music, CPU attack memory, unlock persistence and stage mask/loop invariants. Visual captures live under `tests/visual` locally. Some legacy audio harnesses log resource-in-use warnings only at shutdown despite passing; physical controller feel, longer sessions and subjective balance still benefit from hands-on testing.
+
+Repack an imported Windows project with a matching Godot 4.3 executable:
 
 ```powershell
-Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://tests/verify.gd
+godot.exe --headless --path . --script res://tools/pack_windows.gd
 ```
 
-## Verification and remaining testing
+`tools/archive_source.py` creates a verified full editable-source ZIP, excluding build outputs, caches, local saves and screenshots. `tools/build-assets.cjs` regenerates the initial procedural assets and move table and can overwrite manual move edits; do not run it casually.
 
-18 announcer/results checks pass for round-start voice, pause/resume, both Arcade outcomes, both Local Versus winners, one-shot sequencing, centered buttons, rematch and title-exit cancellation. The centered results screen was visually inspected. The revised SFX suite passes 36 checks, including silent early-round losses and preserved landing sounds. The rebuilt Windows executable launched successfully with no runtime errors in the launch log.
-
-28 jump-pose checks pass across all four fighters: neutral jumps, no damage without an attack, legal airborne kicks, distinct kick/punch artwork, and neutral startup/recovery poses. Side-by-side rendered jump/kick captures are in `tests/visual/jump-vs-kick-*.png`.
-
-33 controller checks pass for custom Sega-style mapping, axis D-pads and attack buttons, duplicate/held input rejection, saved settings, cancellation, keyboard isolation, both players, mirrored QCF/DP commands, menu navigation, disconnect pause and reconnect retention. Run `tests/controller_verify.gd` with the Godot console executable. These are simulated controller events, not a physical Bluetooth hardware test.
-
-Project repository: https://github.com/iamthearchitekt/charmcitybeatdown.git
-
-15 roster checks pass for four-way selection, Alex/Emma match launch, every fighter's legal special and matching audio, defeat voice assignment, rematch selection retention and locked grounded facing. All four face-up KO poses, the four-fighter selection screen, new portraits, pause move lists and Alex's results screen were visually inspected. Report: `tests/roster-verification.txt`.
-
-The knockdown/music update passed 49 additional checks covering both fighters, both knockback directions, throws/sweeps/launchers, corner recovery, ground-hit protection, increased match music levels, immediate KO cutoff, final-KO slow motion, pause, direct KO-to-results completion audio, one-shot playback, rematches and title exit. Coverage also includes menu music continuity, immediate track switching, the music toggle, and the bundled Upheaval Pro font. Rendered title, airborne, grounded and recovery poses were inspected. Report: `tests/knockdown-audio-verification.txt`.
-
-39 audio checks passed: 32 event-routing checks and 7 checks using the real audio driver. These cover all 21 active WAV imports, hit versus block and whiff sounds, projectile timing, trades, match-deciding KO screams, silent earlier round losses, fighter identity in both slots, silent drawn double KOs, landing synchronization, pause/resume, bounded playback and clipping headroom. The latest overlap stress test, including the new match music, peaked at -1.2 dBFS with the master limiter. Reports: `tests/sfx-verification.txt` and `tests/audio-mix-verification.txt`. Run `tests/sfx_verify.gd` and `tests/audio_mix_check.gd` with the Godot console executable without `--headless` to exercise the real audio driver. Subjective voice/effect balance still benefits from hands-on play at your preferred speaker volume.
-
-63 combat/input/asset checks and 5 GPU-rendered visual regression checks passed. Coverage includes specials from both sides, normal input priority, standing/crouching guard, throws, trades, one-hit contact suppression, startup/whiffs, corners, side switches, projectiles, anti-airs, hitstop buffering, combos, rounds, timeouts, double KOs, direct results, rematches, legal CPU moves, both players' keyboard inputs, arrow controls, dashes, grounded KOs, CPU disengagement, boxing idles and valid sprite regions. Rendered frame comparisons confirm pixel-identical pause/resume behavior and exactly two water frames with all non-water scenery unchanged. Reports: `tests/verification.txt` and `tests/visual-regressions.txt`. `tests/visual_check.gd` captures key screens for inspection.
-
-The Windows executable was launched, and the revised title, selection, match, attacks, guard, crouch, KO and results were visually inspected. Keyboard checks use Godot's actual event-input path; desktop automation key injection did not register in the native game window, so physical-keyboard play remains a hands-on check. Also remaining: real controller mapping and simultaneous controllers, keyboard rollover under two-player use, subjective balance and input feel, and longer sessions on other displays. Animation currently uses 18 keyed poses per fighter; it is not a fully hand-animated production set. Additional in-between frames remain a future polish task.
-
-Godot is distributed under the MIT license; see https://godotengine.org/license/ for engine and third-party notices.
+Repository: https://github.com/iamthearchitekt/charmcitybeatdown.git . This recovered workspace has no git history; no push was performed in this continuation. Godot is MIT-licensed; see https://godotengine.org/license/ .

@@ -32,7 +32,7 @@ func attack(s,name:String,defense:Dictionary={},count:int=55):
 
 func run():
 	var s=setup()
-	check(s.data.fighters.size()==4,"Four selectable fighter appearances with two editable move sets")
+	check(s.data.fighters.size()==14,"Fourteen fighter appearances with editable move sets")
 	for fd in s.data.fighters:
 		var complete=true
 		for name in ["lp","hp","lk","hk","c_lp","c_hp","c_lk","c_hk","air_lp","air_hp","air_lk","air_hk","throw","special1","special2"]:
@@ -78,7 +78,8 @@ func run():
 	check(s.fighters[1].health==1000,"Crouching guard blocks low")
 	s=setup()
 	attack(s,"hk",{"back":true,"down":true})
-	check(s.fighters[1].health<1000,"Overhead defeats crouching guard")
+	check(s.fighters[1].health==1000,"High boot visibly above crouching head whiffs")
+	check(not s.guard_blocks(s.fighters[1],s.data.fighters[0].moves.hk,{"back":true,"down":true}),"Crouch guard still cannot block an overhead when it connects")
 	s=setup()
 	s.fighters[1].x=552.0
 	attack(s,"throw",{"back":true})
@@ -206,11 +207,42 @@ func run():
 		if distance<155 and control.dx==s.fighters[1].facing: crowded_forward+=1
 		s.step([{"dx":-1,"back":true},control])
 	check(retreats>10 and crowded_forward==0,"Normal CPU backs off and never walks into close pushbox pressure")
+	s=setup()
+	s.fighters[0].x=400
+	s.fighters[1].x=700
+	var guarded_incoming=0
+	var guarded_outgoing=0
+	var shot={"owner":0,"x":600.0,"y":Combat.FLOOR-92*Combat.FIGHTER_SCALE,"facing":1,"life":80}
+	s.projectiles=[shot]
+	for seed_value in 30:
+		cpu=CPU.new();cpu.rng.seed=seed_value
+		shot.facing=1
+		var defense=cpu.control(s,1,1)
+		if defense.back and defense.down: guarded_incoming+=1
+		cpu=CPU.new();cpu.rng.seed=seed_value
+		shot.facing=-1
+		if cpu.control(s,1,1).back: guarded_outgoing+=1
+	check(guarded_incoming>0 and guarded_incoming<30 and guarded_outgoing==0,"CPU crouch-blocks some incoming shots and ignores shots moving away")
+	s=setup()
+	s.fighters[0].x=500
+	s.fighters[1].x=612
+	s.start_move(s.fighters[0],"hp")
+	var missed=s.move_data(s.fighters[0])
+	s.fighters[0].frame=missed.startup+missed.active+1
+	cpu=CPU.new()
+	var counters=0
+	for seed_value in 30:
+		cpu=CPU.new();cpu.rng.seed=seed_value
+		if cpu.control(s,1,1).command=="lp": counters+=1
+	check(counters>0 and counters<30,"CPU sometimes punishes a nearby missed heavy with a fast jab")
+	cpu=CPU.new()
+	cpu.cooldown=8
+	check(cpu.control(s,1,1).command=="","Whiff punishment still respects the CPU cooldown")
 	# Full scene smoke and real Godot input-event path (headless, no hardware required).
 	var main=load("res://main.tscn").instantiate()
 	root.add_child(main)
 	await process_frame
-	for kind in 4:
+	for kind in s.data.fighters.size():
 		var atlas=main.art.sheets[kind].get_image()
 		var valid=atlas.detect_alpha()!=Image.ALPHA_NONE
 		for region in main.art.regions[kind]:

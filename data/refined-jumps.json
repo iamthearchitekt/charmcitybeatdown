@@ -1,0 +1,82 @@
+{
+  "1": {
+    "path": "res://assets/brook-vivian-motion-final.png",
+    "neutral": [
+      953,
+      118,
+      180,
+      306
+    ],
+    "punch": [
+      1329,
+      112,
+      275,
+      312
+    ],
+    "reference_height": 335
+  },
+  "3": {
+    "path": "res://assets/female-motion-slender.png",
+    "neutral": [
+      603,
+      320,
+      144,
+      243
+    ],
+    "punch": [
+      848,
+      320,
+      206,
+      243
+    ],
+    "reference_height": 248
+  },
+  "4": {
+    "path": "res://assets/female-motion-slender.png",
+    "neutral": [
+      607,
+      611,
+      142,
+      241
+    ],
+    "punch": [
+      847,
+      612,
+      207,
+      241
+    ],
+    "reference_height": 242
+  },
+  "5": {
+    "path": "res://assets/brook-vivian-motion-final.png",
+    "neutral": [
+      958,
+      599,
+      175,
+      294
+    ],
+    "punch": [
+      1336,
+      597,
+      261,
+      296
+    ],
+    "reference_height": 308
+  },
+  "9": {
+    "path": "res://assets/female-motion-slender.png",
+    "neutral": [
+      635,
+      1267,
+      94,
+      171
+    ],
+    "punch": [
+      885,
+      1270,
+      133,
+      168
+    ],
+    "reference_height": 255
+  }
+}

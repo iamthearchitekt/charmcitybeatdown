@@ -1,0 +1,42 @@
+{
+  "alien-power": {
+    "source_seconds": 189.206,
+    "start_seconds": 0.0,
+    "end_seconds": 179.75,
+    "loop_seconds": 177.75,
+    "crossfade_seconds": 2,
+    "gain_db": -1.52
+  },
+  "back-to-the-industry": {
+    "source_seconds": 69.774,
+    "start_seconds": 0.0,
+    "end_seconds": 60.25,
+    "loop_seconds": 58.25,
+    "crossfade_seconds": 2,
+    "gain_db": -0.812
+  },
+  "go-straight": {
+    "source_seconds": 204.148,
+    "start_seconds": 7.5,
+    "end_seconds": 194.75,
+    "loop_seconds": 185.25,
+    "crossfade_seconds": 2,
+    "gain_db": -0.975
+  },
+  "never-return-alive": {
+    "source_seconds": 219.534,
+    "start_seconds": 0.0,
+    "end_seconds": 210.25,
+    "loop_seconds": 208.25,
+    "crossfade_seconds": 2,
+    "gain_db": -0.815
+  },
+  "revenge-of-mr-x": {
+    "source_seconds": 86.075,
+    "start_seconds": 0.0,
+    "end_seconds": 77.25,
+    "loop_seconds": 75.25,
+    "crossfade_seconds": 2,
+    "gain_db": -0.969
+  }
+}

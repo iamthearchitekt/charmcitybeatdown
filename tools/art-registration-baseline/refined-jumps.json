@@ -1,0 +1,82 @@
+{
+  "1": {
+    "path": "res://assets/female-motion-refined.png",
+    "neutral": [
+      607,
+      35,
+      143,
+      237
+    ],
+    "punch": [
+      843,
+      33,
+      207,
+      239
+    ],
+    "reference_height": 253
+  },
+  "3": {
+    "path": "res://assets/female-motion-refined.png",
+    "neutral": [
+      603,
+      321,
+      147,
+      241
+    ],
+    "punch": [
+      848,
+      321,
+      206,
+      241
+    ],
+    "reference_height": 244
+  },
+  "4": {
+    "path": "res://assets/female-motion-refined.png",
+    "neutral": [
+      605,
+      612,
+      145,
+      239
+    ],
+    "punch": [
+      844,
+      613,
+      210,
+      239
+    ],
+    "reference_height": 239
+  },
+  "5": {
+    "path": "res://assets/female-motion-refined.png",
+    "neutral": [
+      608,
+      906,
+      137,
+      225
+    ],
+    "punch": [
+      843,
+      905,
+      203,
+      227
+    ],
+    "reference_height": 232
+  },
+  "9": {
+    "path": "res://assets/female-motion-refined.png",
+    "neutral": [
+      634,
+      1268,
+      95,
+      170
+    ],
+    "punch": [
+      882,
+      1272,
+      135,
+      167
+    ],
+    "reference_height": 253
+  }
+}

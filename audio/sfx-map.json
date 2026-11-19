@@ -2,6 +2,36 @@
   "source": "User-supplied Street Fighter II / Super Street Fighter II CPS-1 SFX and Voices packs",
   "base_path": "res://audio/sf2-cps1/",
   "cues": {
+    "box_break": {
+      "files": [
+        "1F_break_wood.wav"
+      ],
+      "db": -15
+    },
+    "rapid_kick": {
+      "files": [
+        "59_whoosh.wav"
+      ],
+      "db": -19
+    },
+    "rapid_kick_hit": {
+      "files": [
+        "17_attack_5.wav"
+      ],
+      "db": -17
+    },
+    "hurricane_kick": {
+      "files": [
+        "49_shoto_tatsumakisenpuukyaku.wav"
+      ],
+      "db": -15
+    },
+    "spinning_kick": {
+      "files": [
+        "4A_chunli_spinningbirdkick.wav"
+      ],
+      "db": -15
+    },
     "light_punch": {
       "files": [
         "13_attack_1.wav",
@@ -67,6 +97,12 @@
       ],
       "db": -15
     },
+    "projectile_voice": {
+      "files": [
+        "47_shoto_hadoken.wav"
+      ],
+      "db": -13
+    },
     "rise": {
       "files": [
         "59_whoosh.wav"
@@ -123,17 +159,17 @@
     },
     "menu_move": {
       "files": [
-        "1C_clink.wav"
+        "5B_zap_1.wav"
       ],
-      "db": -21,
+      "db": -22,
       "group": "ui",
       "min_interval_ms": 45
     },
     "menu_confirm": {
       "files": [
-        "5B_zap_1.wav"
+        "5E_zap_3.wav"
       ],
-      "db": -15,
+      "db": -18,
       "group": "ui"
     },
     "menu_back": {
@@ -155,6 +191,115 @@
         "57_metal_clang.wav"
       ],
       "db": -18
+    },
+    "final_ko_male": {
+      "files": [
+        "../fighter-voices/final-male.wav"
+      ],
+      "db": -10,
+      "group": "final_ko"
+    },
+    "block_male": {
+      "files": [
+        "../fighter-voices/block-male-1.wav",
+        "../fighter-voices/block-male-2.wav"
+      ],
+      "db": -15,
+      "random": true,
+      "group": "grunt",
+      "min_interval_ms": 140,
+      "file_gain_db": {
+        "../fighter-voices/block-male-2.wav": 3
+      }
+    },
+    "final_ko_female": {
+      "files": [
+        "../fighter-voices/final-female.wav"
+      ],
+      "db": -10,
+      "group": "final_ko"
+    },
+    "block_female": {
+      "files": [
+        "../fighter-voices/block-female-1.wav",
+        "../fighter-voices/block-female-2.wav"
+      ],
+      "db": -15,
+      "random": true,
+      "group": "grunt",
+      "min_interval_ms": 140,
+      "file_gain_db": {
+        "../fighter-voices/block-female-1.wav": 2
+      }
+    },
+    "female_victory": {
+      "files": [
+        "../fighter-voices/female-victory.wav"
+      ],
+      "db": -11,
+      "group": "victory"
+    },
+    "car_clang": {
+      "files": [
+        "57_metal_clang.wav"
+      ],
+      "db": -18
+    },
+    "car_glass": {
+      "files": [
+        "58_break_glass.wav"
+      ],
+      "db": -15
+    },
+    "car_break": {
+      "files": [
+        "24_break_metal.wav"
+      ],
+      "db": -16
+    },
+    "car_destroyed": {
+      "files": [
+        "24_break_metal.wav",
+        "58_break_glass.wav"
+      ],
+      "db": -20,
+      "layered": true
+    },
+    "electric": {
+      "files": [
+        "5C_zap_2.wav"
+      ],
+      "db": -10
+    },
+    "electric_pulse": {
+      "files": [
+        "5C_zap_2.wav"
+      ],
+      "db": -12
+    },
+    "electric_hit": {
+      "files": [
+        "5B_zap_1.wav"
+      ],
+      "db": -20,
+      "min_interval_ms": 70
+    },
+    "flame": {
+      "files": [
+        "45_dhalsim_flame.wav",
+        "5D_whoosh_2.wav"
+      ],
+      "db": -11,
+      "layered": true,
+      "file_gain_db": {
+        "5D_whoosh_2.wav": -6
+      }
+    },
+    "flame_hit": {
+      "files": [
+        "5E_zap_3.wav"
+      ],
+      "db": -19
     }
   }
 }

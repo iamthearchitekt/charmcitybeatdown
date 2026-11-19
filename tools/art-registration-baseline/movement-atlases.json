@@ -1,0 +1,456 @@
+{
+  "0": {
+    "path": "res://assets/movement-a.png",
+    "regions": [
+      [
+        56,
+        24,
+        197,
+        272
+      ],
+      [
+        399,
+        23,
+        114,
+        273
+      ],
+      [
+        663,
+        45,
+        283,
+        251
+      ],
+      [
+        946,
+        49,
+        265,
+        247
+      ]
+    ],
+    "anchors": [
+      98.5,
+      57.0,
+      141.5,
+      100.7
+    ],
+    "height": 272,
+    "projectile": true
+  },
+  "1": {
+    "path": "res://assets/female-motion-refined.png",
+    "regions": [
+      [
+        51,
+        37,
+        173,
+        253
+      ],
+      [
+        341,
+        37,
+        121,
+        254
+      ]
+    ],
+    "anchors": [
+      86.5,
+      60.5
+    ],
+    "height": 253,
+    "projectile": false,
+    "uniform_scale": true
+  },
+  "2": {
+    "path": "res://assets/movement-a.png",
+    "regions": [
+      [
+        60,
+        644,
+        190,
+        278
+      ],
+      [
+        394,
+        645,
+        119,
+        276
+      ],
+      [
+        662,
+        660,
+        284,
+        262
+      ],
+      [
+        946,
+        667,
+        261,
+        255
+      ]
+    ],
+    "anchors": [
+      95.0,
+      59.5,
+      142.0,
+      99.18
+    ],
+    "height": 278,
+    "projectile": true
+  },
+  "3": {
+    "path": "res://assets/female-motion-refined.png",
+    "regions": [
+      [
+        48,
+        332,
+        173,
+        244
+      ],
+      [
+        354,
+        332,
+        102,
+        244
+      ]
+    ],
+    "anchors": [
+      86.5,
+      51.0
+    ],
+    "height": 244,
+    "projectile": false,
+    "uniform_scale": true
+  },
+  "4": {
+    "path": "res://assets/female-motion-refined.png",
+    "regions": [
+      [
+        48,
+        628,
+        180,
+        239
+      ],
+      [
+        359,
+        627,
+        96,
+        244
+      ]
+    ],
+    "anchors": [
+      90.0,
+      48.0
+    ],
+    "height": 239,
+    "projectile": false,
+    "uniform_scale": true
+  },
+  "5": {
+    "path": "res://assets/female-motion-refined.png",
+    "regions": [
+      [
+        50,
+        923,
+        177,
+        232
+      ],
+      [
+        353,
+        923,
+        104,
+        232
+      ]
+    ],
+    "anchors": [
+      88.5,
+      52.0
+    ],
+    "height": 232,
+    "projectile": false,
+    "uniform_scale": true
+  },
+  "6": {
+    "path": "res://assets/spike-supplement-refined.png",
+    "regions": [
+      [
+        68,
+        27,
+        350,
+        441
+      ],
+      [
+        568,
+        27,
+        180,
+        441
+      ],
+      [
+        887,
+        67,
+        338,
+        401
+      ],
+      [
+        1290,
+        82,
+        435,
+        386
+      ]
+    ],
+    "anchors": [
+      175.0,
+      90.0,
+      169.0,
+      165.3
+    ],
+    "height": 441,
+    "projectile": true,
+    "uniform_scale": true
+  },
+  "7": {
+    "path": "res://assets/movement-b.png",
+    "regions": [
+      [
+        77,
+        944,
+        218,
+        273
+      ],
+      [
+        435,
+        940,
+        114,
+        277
+      ],
+      [
+        650,
+        952,
+        296,
+        265
+      ],
+      [
+        946,
+        956,
+        248,
+        261
+      ]
+    ],
+    "anchors": [
+      109.0,
+      57.0,
+      148.0,
+      94.24
+    ],
+    "height": 273,
+    "projectile": true
+  },
+  "8": {
+    "path": "res://assets/movement-c.png",
+    "regions": [
+      [
+        54,
+        23,
+        239,
+        283
+      ],
+      [
+        424,
+        18,
+        118,
+        288
+      ],
+      [
+        652,
+        43,
+        210,
+        263
+      ],
+      [
+        947,
+        59,
+        277,
+        247
+      ]
+    ],
+    "anchors": [
+      119.5,
+      59.0,
+      105.0,
+      105.26
+    ],
+    "height": 283,
+    "projectile": true
+  },
+  "9": {
+    "path": "res://assets/female-motion-refined.png",
+    "regions": [
+      [
+        41,
+        1187,
+        189,
+        253
+      ],
+      [
+        354,
+        1189,
+        98,
+        252
+      ]
+    ],
+    "anchors": [
+      94.5,
+      49.0
+    ],
+    "height": 253,
+    "projectile": false,
+    "uniform_scale": true
+  },
+  "10": {
+    "path": "res://assets/movement-c.png",
+    "regions": [
+      [
+        51,
+        639,
+        238,
+        287
+      ],
+      [
+        419,
+        635,
+        108,
+        291
+      ],
+      [
+        644,
+        651,
+        302,
+        274
+      ],
+      [
+        946,
+        671,
+        278,
+        254
+      ]
+    ],
+    "anchors": [
+      119.0,
+      54.0,
+      151.0,
+      105.64
+    ],
+    "height": 287,
+    "projectile": true
+  },
+  "11": {
+    "path": "res://assets/movement-c.png",
+    "regions": [
+      [
+        57,
+        951,
+        243,
+        286
+      ],
+      [
+        404,
+        950,
+        116,
+        287
+      ],
+      [
+        653,
+        974,
+        293,
+        263
+      ],
+      [
+        946,
+        981,
+        278,
+        256
+      ]
+    ],
+    "anchors": [
+      121.5,
+      58.0,
+      146.5,
+      105.64
+    ],
+    "height": 286,
+    "projectile": true
+  },
+  "12": {
+    "path": "res://assets/movement-d.png",
+    "regions": [
+      [
+        63,
+        16,
+        304,
+        396
+      ],
+      [
+        526,
+        16,
+        208,
+        398
+      ],
+      [
+        892,
+        40,
+        438,
+        369
+      ],
+      [
+        1330,
+        44,
+        355,
+        368
+      ]
+    ],
+    "anchors": [
+      152.0,
+      104.0,
+      219.0,
+      134.9
+    ],
+    "height": 396,
+    "projectile": true
+  },
+  "13": {
+    "path": "res://assets/movement-d.png",
+    "regions": [
+      [
+        45,
+        461,
+        310,
+        407
+      ],
+      [
+        546,
+        458,
+        341,
+        411
+      ],
+      [
+        887,
+        494,
+        443,
+        375
+      ],
+      [
+        1330,
+        497,
+        357,
+        366
+      ]
+    ],
+    "anchors": [
+      155.0,
+      170.5,
+      221.5,
+      135.66
+    ],
+    "height": 407,
+    "projectile": true
+  }
+}

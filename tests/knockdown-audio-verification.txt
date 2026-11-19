@@ -1,44 +1,49 @@
-PASS Title starts menu music at the increased level without the match track
+PASS Title starts menu music at its configured level without the match track
 PASS All screens use bundled Upheaval Pro
 PASS Character selection continues menu music without restarting
 PASS Starting a match cuts menu music before match music begins
 PASS Go Straight starts at the increased level during the match
-PASS Match music uses the supplied looping MP3
+FAIL Match music uses the supplied looping MP3
 PASS Completion clip decodes and is non-looping
-PASS Backward launch: kind 0, throw, direction -1
-PASS Full grounded knockdown and recovery: 0/throw/-1
+PASS Throw visibly captures before release
+FAIL Backward launch: kind 0, throw, direction -1
+FAIL Full grounded knockdown and recovery: 0/throw/-1
 PASS Backward launch: kind 0, c_hk, direction -1
 PASS Full grounded knockdown and recovery: 0/c_hk/-1
 PASS Backward launch: kind 0, special2, direction -1
 PASS Full grounded knockdown and recovery: 0/special2/-1
-PASS Backward launch: kind 0, throw, direction 1
-PASS Full grounded knockdown and recovery: 0/throw/1
+PASS Throw visibly captures before release
+FAIL Backward launch: kind 0, throw, direction 1
+FAIL Full grounded knockdown and recovery: 0/throw/1
 PASS Backward launch: kind 0, c_hk, direction 1
 PASS Full grounded knockdown and recovery: 0/c_hk/1
 PASS Backward launch: kind 0, special2, direction 1
 PASS Full grounded knockdown and recovery: 0/special2/1
-PASS Backward launch: kind 1, throw, direction -1
-PASS Full grounded knockdown and recovery: 1/throw/-1
+PASS Throw visibly captures before release
+FAIL Backward launch: kind 1, throw, direction -1
+FAIL Full grounded knockdown and recovery: 1/throw/-1
 PASS Backward launch: kind 1, c_hk, direction -1
 PASS Full grounded knockdown and recovery: 1/c_hk/-1
 PASS Backward launch: kind 1, special2, direction -1
 PASS Full grounded knockdown and recovery: 1/special2/-1
-PASS Backward launch: kind 1, throw, direction 1
-PASS Full grounded knockdown and recovery: 1/throw/1
+PASS Throw visibly captures before release
+FAIL Backward launch: kind 1, throw, direction 1
+FAIL Full grounded knockdown and recovery: 1/throw/1
 PASS Backward launch: kind 1, c_hk, direction 1
 PASS Full grounded knockdown and recovery: 1/c_hk/1
 PASS Backward launch: kind 1, special2, direction 1
 PASS Full grounded knockdown and recovery: 1/special2/1
 PASS Prone fighter cannot be repeatedly hit on the floor
-PASS Corner knockdown lands and recovers inside stage, side -1
-PASS Corner knockdown lands and recovers inside stage, side 1
+FAIL Corner knockdown lands and recovers inside stage, side -1
+FAIL Corner knockdown lands and recovers inside stage, side 1
 PASS Music stops on the KO frame before defeat voice dispatch
 PASS Decisive KO starts quarter-speed presentation
 PASS Combat remains fixed-step: six simulation steps over 24 slow-motion frames
 PASS Pause freezes the slow-motion effect
 PASS Slow motion returns automatically to normal speed
 PASS Completion clip waits for the KO presentation to finish
-PASS Final KO goes directly to results and completion audio
+PASS Results wait for the complete supplied final KO voice
+PASS Completion audio starts after final KO audio ends
 PASS Results frames do not restart the completion clip
 PASS Completion clip finishes once without restarting on the results screen
 PASS Rematch stops the completion clip and restarts match music
@@ -47,4 +52,4 @@ PASS Returning to title stops both tracks
 PASS Returning to title restarts menu music
 PASS Music toggle also silences menu music
 PASS Non-decisive rounds do not trigger final-KO slow motion
-Failures: 0
+Failures: 11

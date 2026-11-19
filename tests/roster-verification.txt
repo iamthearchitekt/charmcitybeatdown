@@ -1,16 +1,35 @@
-PASS Four generic names include Alex for the brown-haired male
-PASS Left wraps from Marcus to Emma
-PASS Right wraps from Emma to Marcus
+PASS Eleven fighters have the requested names
+PASS Down moves to the second portrait row
+PASS Up moves to the first portrait row
+PASS Eleven portrait buttons are visible, distinct and clickable
+PASS Left wraps from Marcus to Jeff
+PASS Right wraps from Jeff to Marcus
 PASS Alex selection advances to opponent choice
-PASS Alex and Emma start a playable match
+PASS Opponent selection moves to the second portrait row
+PASS Opponent row navigation preserves the selected column
+PASS Alex and Lauren start a playable match
 PASS Legal special and matching sound for MARCUS
 PASS Correct defeat voice for MARCUS
-PASS Legal special and matching sound for MAYA
-PASS Correct defeat voice for MAYA
+PASS Legal special and matching sound for BROOK LYNNE
+PASS Correct defeat voice for BROOK LYNNE
 PASS Legal special and matching sound for ALEX
 PASS Correct defeat voice for ALEX
-PASS Legal special and matching sound for EMMA
-PASS Correct defeat voice for EMMA
-PASS Rematch preserves Alex and Emma and resets scores
+PASS Legal special and matching sound for LAUREN
+PASS Correct defeat voice for LAUREN
+PASS Legal special and matching sound for CHELSEA
+PASS Correct defeat voice for CHELSEA
+PASS Legal special and matching sound for VIVIAN
+PASS Correct defeat voice for VIVIAN
+PASS Legal special and matching sound for SPIKE
+PASS Correct defeat voice for SPIKE
+PASS Legal special and matching sound for ERIC
+PASS Correct defeat voice for ERIC
+PASS Legal special and matching sound for STAN
+PASS Correct defeat voice for STAN
+PASS Legal special and matching sound for RACHEL
+PASS Correct defeat voice for RACHEL
+PASS Legal special and matching sound for JEFF
+PASS Correct defeat voice for JEFF
+PASS Rematch preserves Alex and Lauren and resets scores
 PASS Prone pose does not flip when the opponent crosses over
 Failures: 0

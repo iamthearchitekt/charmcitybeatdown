@@ -1,10 +1,16 @@
 extends RefCounted
+const Combat=preload("res://scripts/combat.gd")
 var cooldown:int=0
 var reaction:int=0
 var intent:Dictionary={}
 var burst:int=0
 var rest:int=0
 var approach:int=0
+var observed_move=""
+var observed_frame=-1
+var repeated_move=""
+var repeat_count=0
+var last_repeat_tick=-999
 var rng=RandomNumberGenerator.new()
 
 func _init(): rng.seed=3701
@@ -14,12 +20,40 @@ func control(sim,slot:int,difficulty:int)->Dictionary:
 	var foe=sim.fighters[1-slot]
 	var out={"dx":0,"down":false,"up":false,"back":false,"command":""}
 	if sim.phase!="fight" or sim.freeze>0: return out
+	if me.grabbed_by>=0:
+		out.dx=1 if int(sim.tick/6)%2==0 else -1
+		out.command="lp" if sim.tick%12==0 else ""
+		return out
+	if me.state=="dizzy":
+		# Discrete, human-rate recovery attempts; never instant CPU recovery.
+		out.dx=1 if int(sim.tick/4)%2==0 else -1
+		out.command="lp" if sim.tick%10==0 else ""
+		intent={"dx":0,"down":false,"up":false,"back":false,"command":""}
+		reaction=0
+		return out
+	# Observe actual attacks, including while stunned; never inspect player inputs.
+	if foe.move!="" and (foe.move!=observed_move or foe.frame<observed_frame):
+		if foe.move==repeated_move and sim.tick-last_repeat_tick<150: repeat_count+=1
+		else: repeated_move=foe.move;repeat_count=1
+		last_repeat_tick=sim.tick
+	observed_move=foe.move
+	observed_frame=foe.frame
+	if sim.tick-last_repeat_tick>210: repeat_count=0
+	if me.state in ["knockdown","down","getup"]: return out
 	# Thinking and spacing are distinct from attack speed. No perfect-pressure loop.
-	if me.stun>0 or me.move!="": return out
+	if me.stun>0:
+		if repeat_count>=3:
+			# A learned guard is held through hitstun just as a player can hold back.
+			# This avoids repeatedly starting a fresh retreat against every jab.
+			out.dx=-me.facing;out.back=true
+			out.down=sim.move_data(foe).get("level","")=="low"
+			intent=out.duplicate()
+		return out
+	if me.move!="": return out
 	cooldown=maxi(0,cooldown-1)
 	var distance=absf(me.x-foe.x)
 	if burst>=2 and rest==0:
-		rest=[42,32,22][difficulty]
+		rest=[40,30,21][difficulty]
 		burst=0
 	if rest>0:
 		rest-=1
@@ -30,31 +64,62 @@ func control(sim,slot:int,difficulty:int)->Dictionary:
 		return out
 	reaction-=1
 	if reaction<=0:
-		reaction=[25,18,11][difficulty]+rng.randi_range(0,7)
-		var threatened=(foe.move!="" and distance<185) or not sim.projectiles.is_empty()
+		reaction=[23,15,9][difficulty]+rng.randi_range(0,7)
+		var foe_move=sim.move_data(foe)
+		var reach=(float(foe_move.box[0])+float(foe_move.box[2]))*sim.FIGHTER_SCALE+35 if not foe_move.is_empty() else 185.0
+		var predictable=repeat_count>=3 and foe.move==repeated_move
+		var recovering=not foe_move.is_empty() and foe.frame>=foe_move.startup+foe_move.active
+		var melee_threat=foe.move!="" and not recovering and distance<minf(310,reach)
+		var incoming_shot=projectile_approaching(sim,me,slot,[11,17,22][difficulty])
+		var target_parts=sim.hurtboxes(foe)
 		intent={"dx":0,"down":false,"up":false,"back":false,"command":""}
-		if threatened and rng.randf()<[.30,.55,.75][difficulty]:
+		var punish=""
+		if recovering and not incoming_shot and cooldown==0 and distance<200 and (not foe.connected or predictable):
+			var chance=[.24,.47,.63][difficulty]+(.12 if predictable else 0.0)
+			if rng.randf()<chance:
+				for move in ["lp","mp","hp"]:
+					if normal_in_reach(sim,me,target_parts,move):
+						punish=move
+						break
+		if punish!="":
+			intent.command=punish
+		elif (melee_threat or incoming_shot) and rng.randf()<minf(.92,[.37,.64,.82][difficulty]+(.16 if predictable else 0.0)):
 			intent.back=true
 			intent.dx=-me.facing
-			intent.down=foe.crouch
+			intent.down=foe_move.get("level","")=="low" if melee_threat else incoming_shot
 		elif distance>185:
 			intent.dx=me.facing
 			approach=[8,10,12][difficulty]
 			if rng.randf()<.13: intent.up=true
-			if cooldown==0 and distance>230 and rng.randf()<.25:
-				intent.command="special1"
+			if cooldown==0 and distance>230 and me.kind!=4 and rng.randf()<.25:
+				if me.kind==10: intent.command="special5" if foe.guard and not foe.crouch else "special1"
+				elif me.kind==0 and distance<290: intent.command="special6" if foe.guard else "special5"
+				else: intent.command="special1"
 		elif cooldown==0:
-			var choices=["lp","lk","hp","hk"] if distance<150 else ["hp","hk"]
+			var choices=["lp","lk","mp","mk","hp","hk"] if distance<150 else ["mp","hp","hk"]
+			choices=choices.filter(func(move): return normal_in_reach(sim,me,target_parts,move))
+			var kit=sim.data.fighters[me.kind].moves
+			if kit.has("special3") and distance<(155 if me.kind==6 else (265 if me.kind==10 else 215)) and rng.randf()<.30: choices.append("special3")
+			if kit.has("special4") and distance<250 and rng.randf()<.20: choices.append("special4")
 			if rng.randf()<.18: choices.append("special1")
-			if distance<88: choices.append("throw")
+			if distance<125 and sim.valid_grab(me,foe): choices.append("throw")
+			if kit.has("command_grab") and distance<145 and sim.valid_grab(me,foe) and rng.randf()<.18: choices.append("command_grab")
+			if kit.has("air_throw") and me.y<sim.FLOOR-1 and foe.y<sim.FLOOR-1: choices.append("throw")
 			if foe.y<sim.FLOOR-20: choices=["special2","hp"]
-			intent.command=choices[rng.randi_range(0,choices.size()-1)]
-			intent.down=rng.randf()<.15
+			if not choices.is_empty():
+				intent.command=choices[rng.randi_range(0,choices.size()-1)]
+				intent.down=rng.randf()<.15
+			elif distance<155:
+				intent.dx=-me.facing
+				intent.back=true
+			else:
+				intent.dx=me.facing
+				approach=[8,10,12][difficulty]
 		else:
 			intent.dx=-me.facing if distance<130 else 0
 			intent.back=intent.dx!=0
 		if intent.command!="":
-			cooldown=[24,17,10][difficulty]+rng.randi_range(0,9)
+			cooldown=[22,15,8][difficulty]+rng.randi_range(0,9)
 			burst+=1
 	out=intent.duplicate()
 	intent.command=""
@@ -64,3 +129,24 @@ func control(sim,slot:int,difficulty:int)->Dictionary:
 		if distance<155 or approach<=0: out.dx=0
 		else: approach-=1
 	return out
+
+func projectile_approaching(sim,me:Dictionary,slot:int,lookahead:int)->bool:
+	var body:Rect2=sim.hurtbox(me)
+	if not body.has_area(): return false
+	for shot in sim.projectiles:
+		if shot.owner==slot or shot.life<=0: continue
+		var travel=(me.x-shot.x)*shot.facing
+		var box=Combat.projectile_rect(shot)
+		var width=box.size.x*.5
+		if travel>=-width and travel<=lookahead*Combat.projectile_speed(shot)+width and box.end.y>body.position.y and box.position.y<body.end.y:
+			return true
+	return false
+
+func normal_in_reach(sim,me:Dictionary,target_parts:Array,move:String)->bool:
+	if target_parts.is_empty(): return false
+	var probe=me.duplicate()
+	probe.crouch=false
+	probe.move=sim.legal_command(probe,move)
+	var data=sim.move_data(probe)
+	probe.frame=data.startup
+	return sim.regions_overlap(sim.attackboxes(probe,data),target_parts).has_area()

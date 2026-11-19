@@ -1,4 +1,4 @@
-PASS All 21 active effects and KO voice WAVs import and decode
+PASS All 36 active effects and voice WAVs decode
 PASS Playback pool is bounded to eight voices
 PASS One matching impact cue for lp
 PASS One matching impact cue for hp
@@ -11,19 +11,23 @@ PASS One matching impact cue for throw
 PASS Whiff produces one whoosh and no impact
 PASS Blocked contact produces block cue instead of damage cue
 PASS Projectile launch and delayed contact have distinct cues
+PASS Hadouken voice plays once on actual plasma-ball spawn
+PASS Live Wire zaps throughout a whiffed active burst
+PASS Live Wire uses the longer, audible supplied zap
+PASS Chelsea casts with the Flame sample and whoosh layer even on a whiff
 PASS Both sides of a simultaneous trade remain audible
 PASS Airborne KO does not prematurely play a floor thud
-PASS Airborne Redline defeat plays female scream immediately
+PASS Airborne female defeat plays supplied final scream immediately
 PASS KO landing produces exactly one body thud
-PASS KO voice does not repeat during landing or round-end frames
+PASS Final KO clip plays once through landing and round-end
 PASS KO voice follows fighter identity in slot 0, kind 0
 PASS KO voice follows fighter identity in slot 1, kind 0
 PASS KO voice follows fighter identity in slot 0, kind 1
 PASS KO voice follows fighter identity in slot 1, kind 1
-PASS Drawn double KO has no match-loser scream
-PASS First round loss stays silent for slot 1
+PASS Double KO gives each defeated fighter a scream
+PASS First round defeat screams once for slot 1
 PASS Early round loss keeps landing sound
-PASS First round loss stays silent for slot 0
+PASS First round defeat screams once for slot 0
 PASS Early round loss keeps landing sound
 PASS Timeout without knockout does not trigger a KO scream
 PASS Jump and touchdown cues fire once each

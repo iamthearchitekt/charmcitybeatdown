@@ -22,6 +22,8 @@ func run():
 	main=load("res://main.tscn").instantiate();root.add_child(main);await process_frame
 	main.set_physics_process(false)
 	main.pads=Bindings.new();main.pads.profiles={};main.pads.path="user://controller-test.cfg"
+	# Explicit standard layout exercises the existing Xbox fallback separately.
+	main.pads.primary_layout="standard"
 	main.pads.connect_device(71,"test-sega");main.pads.connect_device(72,"test-second")
 	main.begin_match();main.sim.phase="fight"
 	check(main.KEYS==[[KEY_Z,KEY_X,KEY_C,KEY_V,KEY_B],[KEY_F,KEY_G,KEY_H,KEY_J,KEY_R]],"Original keyboard attacks unchanged")
@@ -30,7 +32,7 @@ func run():
 	axis(JOY_AXIS_LEFT_X,-1);check(main.read_control(0).dx==-1,"Default analog movement")
 	axis(JOY_AXIS_LEFT_X,0)
 	main.open_controller_setup();check(main.paused,"Controller setup pauses the match")
-	tap(8)
+	tap(JOY_BUTTON_A)
 	check(main.setup_step==0 and main.setup_device==71,"First button selects target pad without binding it")
 	# Capture axis D-pad and arbitrary Sega button indices, including an axis-backed button.
 	axis(0,-1);axis(0,0);axis(0,1);axis(0,0);axis(1,-1);axis(1,0);axis(1,1);axis(1,0)
@@ -38,18 +40,20 @@ func run():
 	check(main.setup_step==5,"Held button cannot fill multiple wizard steps")
 	button(4,false);tap(4)
 	check(main.setup_step==5,"Duplicate gameplay bindings rejected")
-	tap(5);tap(0);axis(4,1);axis(4,0);tap(6);tap(7);tap(0);tap(1)
+	tap(JOY_BUTTON_Y);axis(JOY_AXIS_TRIGGER_LEFT,1);axis(JOY_AXIS_TRIGGER_LEFT,0)
+	tap(JOY_BUTTON_A);tap(JOY_BUTTON_B);axis(JOY_AXIS_TRIGGER_RIGHT,1);axis(JOY_AXIS_TRIGGER_RIGHT,0)
+	tap(JOY_BUTTON_RIGHT_SHOULDER);tap(JOY_BUTTON_GUIDE)
 	check(main.setup_step==12 and main.pads.profiles.has("test-sega"),"Complete Sega mapping saves")
 	var stored=ConfigFile.new();stored.load(main.pads.path)
 	check(stored.get_value("controllers","profiles",{}).get("test-sega",{})==main.setup_bindings,"Saved bindings round-trip to disk")
-	key(KEY_ESCAPE);await process_frame;key(KEY_ESCAPE,false)
+	tap(JOY_BUTTON_B)
 	check(not main.controller_setup and main.paused,"Closing setup leaves match paused")
-	tap(7);check(not main.paused,"Mapped Start resumes")
-	for entry in [[4,"lp"],[5,"hp"],[0,"lk"],[6,"throw"]]:
+	tap(JOY_BUTTON_START);check(not main.paused,"Start resumes")
+	for entry in [[4,"lp"],[JOY_BUTTON_Y,"mp"],[0,"lk"],[1,"mk"],[JOY_BUTTON_RIGHT_SHOULDER,"throw"],[JOY_BUTTON_GUIDE,"throw"]]:
 		main.clear_controls();tap(entry[0]);check(main.read_control(0).command==entry[1],"Custom button routes "+entry[1])
-	main.clear_controls();axis(4,1);check(main.read_control(0).command=="hk","Axis-backed attack works")
+	main.clear_controls();axis(JOY_AXIS_TRIGGER_RIGHT,1);check(main.read_control(0).command=="hk","Axis-backed attack works")
 	check(main.pressed[0].is_empty(),"Held attack does not repeat")
-	axis(4,0)
+	axis(JOY_AXIS_TRIGGER_RIGHT,0)
 	for facing in [1,-1]:
 		main.sim.fighters[0].facing=facing;main.clear_controls()
 		axis(1,1);main.read_control(0);axis(0,facing);main.read_control(0);axis(1,0);tap(4)
@@ -64,7 +68,7 @@ func run():
 	check(main.read_control(1).command=="lp","P2 keyboard attack unaffected by Sega profile");key(KEY_F,false)
 	key(KEY_RIGHT);await process_frame;check(main.read_control(0).dx==1,"Arrow keys still move P1");key(KEY_RIGHT,false)
 	key(KEY_W);await process_frame;check(main.read_control(1).up,"W still jumps P2");key(KEY_W,false)
-	main.clear_controls();tap(JOY_BUTTON_Y,72);check(main.read_control(1).command=="hp","Second pad keeps independent default mapping")
+	main.clear_controls();tap(JOY_BUTTON_Y,72);check(main.read_control(1).command=="mp","Second pad keeps independent default mapping")
 	main.controller_connection(71,false)
 	check(main.paused and main.pads.slots==[-1,72],"Disconnect pauses without reassigning P2")
 	main.pads.connect_device(73,"test-sega")
@@ -74,8 +78,8 @@ func run():
 	axis(1,0,73);main.controller_menu_tick();tap(0,73)
 	check(main.screen=="select","Custom confirm opens character select")
 	tap(1,73);check(main.screen=="title","Custom back returns to title")
-	main.open_controller_setup();tap(8,73);tap(3,73)
-	key(KEY_ESCAPE);await process_frame;key(KEY_ESCAPE,false)
+	main.open_controller_setup();tap(JOY_BUTTON_A,73);tap(3,73)
+	tap(JOY_BUTTON_START,73)
 	check(main.pads.mapping(73).left.has("axis"),"Cancelling setup preserves previous saved mapping")
 	main.open_controller_setup()
 	main.queue_redraw();await process_frame;await RenderingServer.frame_post_draw

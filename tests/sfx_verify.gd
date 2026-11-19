@@ -31,9 +31,12 @@ func run():
 	bank=Sfx.new()
 	root.add_child(bank)
 	await process_frame
-	var all_loaded=bank.streams.size()==21
+	var requested={}
+	for cue in bank.config.cues.values():
+		for file in cue.files: requested[file]=true
+	var all_loaded=bank.streams.size()==requested.size()
 	for stream in bank.streams.values(): all_loaded=all_loaded and stream!=null and stream.get_length()>0.05
-	check(all_loaded,"All 21 active effects and KO voice WAVs import and decode")
+	check(all_loaded,"All "+str(requested.size())+" active effects and voice WAVs decode")
 	check(bank.voices.size()==8,"Playback pool is bounded to eight voices")
 	for move in ["lp","hp","lk","hk","c_lp","c_hk","special1","throw"]:
 		var sim=setup()
@@ -53,6 +56,20 @@ func run():
 	step(sim,{"command":"special1"})
 	for i in 70: step(sim)
 	check(count_cue("projectile")==1 and count_cue("special_hit")==1,"Projectile launch and delayed contact have distinct cues")
+	check(count_cue("projectile_voice")==1,"Hadouken voice plays once on actual plasma-ball spawn")
+	sim=setup(420)
+	sim.new_match(6,0);sim.phase="fight"
+	sim.fighters[0].x=400;sim.fighters[1].x=820
+	step(sim,{"command":"special3"})
+	for i in 64: step(sim)
+	check(count_cue("electric")==1 and count_cue("electric_pulse")==2 and count_cue("electric_hit")==0,"Live Wire zaps throughout a whiffed active burst")
+	check(bank.playback_log.any(func(item):return item.cue=="electric" and item.file=="5C_zap_2.wav" and item.db>=-12),"Live Wire uses the longer, audible supplied zap")
+	sim=setup(420)
+	sim.new_match(4,0);sim.phase="fight"
+	sim.fighters[0].x=400;sim.fighters[1].x=820
+	step(sim,{"command":"special1"})
+	for i in 50: step(sim)
+	check(count_cue("flame")==2 and bank.playback_log.any(func(item):return item.file=="45_dhalsim_flame.wav") and count_cue("flame_hit")==0,"Chelsea casts with the Flame sample and whoosh layer even on a whiff")
 	sim=setup()
 	sim.new_match(0,0);sim.phase="fight"
 	sim.fighters[0].x=450;sim.fighters[1].x=525
@@ -67,10 +84,10 @@ func run():
 	sim.end_round()
 	for event in sim.events: bank.combat_event(event,sim)
 	check(count_cue("ko_land")==0,"Airborne KO does not prematurely play a floor thud")
-	check(count_cue("ko_redline")==1,"Airborne Redline defeat plays female scream immediately")
+	check(count_cue("final_ko_female")==1,"Airborne female defeat plays supplied final scream immediately")
 	for i in 65: step(sim)
 	check(count_cue("ko_land")==1,"KO landing produces exactly one body thud")
-	check(count_cue("ko_redline")==1,"KO voice does not repeat during landing or round-end frames")
+	check(count_cue("final_ko_female")==1,"Final KO clip plays once through landing and round-end")
 	for kind in 2:
 		for slot in 2:
 			sim=setup()
@@ -79,16 +96,16 @@ func run():
 			sim.wins[1-slot]=1
 			sim.end_round()
 			for event in sim.events: bank.combat_event(event,sim)
-			check(count_cue("ko_breakwater" if kind==0 else "ko_redline")==1 and count_cue("ko_redline" if kind==0 else "ko_breakwater")==0,"KO voice follows fighter identity in slot "+str(slot)+", kind "+str(kind))
+			check(count_cue("final_ko_male" if kind==0 else "final_ko_female")==1 and count_cue("final_ko_female" if kind==0 else "final_ko_male")==0,"KO voice follows fighter identity in slot "+str(slot)+", kind "+str(kind))
 	sim=setup()
 	for f in sim.fighters: f.health=0
 	sim.end_round()
 	for event in sim.events: bank.combat_event(event,sim)
-	check(count_cue("ko_breakwater")==0 and count_cue("ko_redline")==0,"Drawn double KO has no match-loser scream")
+	check(count_cue("ko_breakwater")==1 and count_cue("ko_redline")==1,"Double KO gives each defeated fighter a scream")
 	for winner in 2:
 		sim=setup();sim.fighters[1-winner].health=0;sim.end_round()
 		for event in sim.events: bank.combat_event(event,sim)
-		check(count_cue("ko_breakwater")==0 and count_cue("ko_redline")==0,"First round loss stays silent for slot "+str(1-winner))
+		check(count_cue("ko_breakwater" if winner==1 else "ko_redline")==1,"First round defeat screams once for slot "+str(1-winner))
 		check(count_cue("ko_land")>0,"Early round loss keeps landing sound")
 	sim=setup()
 	sim.time_left=0;sim.fighters[1].health=500

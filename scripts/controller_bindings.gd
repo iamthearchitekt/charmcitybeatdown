@@ -1,7 +1,11 @@
 extends RefCounted
 # Controller-only configuration. Keyboard bindings never pass through this class.
-const STEPS=["left","right","up","down","lp","hp","lk","hk","throw","pause","confirm","back"]
-const LABELS=["D-PAD LEFT","D-PAD RIGHT","D-PAD UP","D-PAD DOWN","LIGHT PUNCH  /  SEGA X","HEAVY PUNCH  /  SEGA Z","LIGHT KICK  /  SEGA A","HEAVY KICK  /  SEGA C","THROW  /  SEGA Y","PAUSE  /  START","MENU CONFIRM  /  SEGA A","MENU BACK  /  SEGA B"]
+const STEPS=["left","right","up","down","lp","mp","hp","lk","mk","hk","throw","throw_right"]
+const LABELS=["D-PAD LEFT","D-PAD RIGHT","D-PAD UP","D-PAD DOWN","X  /  LIGHT PUNCH","Y  /  MEDIUM PUNCH","Z  /  HEAVY PUNCH","A  /  LIGHT KICK","B  /  MEDIUM KICK","C  /  HEAVY KICK","L  /  GRAPPLE","R  /  GRAPPLE"]
+const ACTIONS=["lp","mp","hp","lk","mk","hk","throw","throw_right","pause","confirm","back"]
+# The user's confirmed primary controller is a Retro-Bit Sega pad. Windows may
+# identify it as an Xbox/ generic device, so its layout cannot rely on the name.
+var primary_layout="retrobit"
 var path="user://controllers.cfg"
 var profiles:Dictionary={}
 var slots:Array=[-1,-1]
@@ -34,12 +38,27 @@ func disconnect_device(id:int)->int:
 
 func defaults()->Dictionary:
 	var result={}
-	var buttons={"left":JOY_BUTTON_DPAD_LEFT,"right":JOY_BUTTON_DPAD_RIGHT,"up":JOY_BUTTON_DPAD_UP,"down":JOY_BUTTON_DPAD_DOWN,"lp":JOY_BUTTON_X,"hp":JOY_BUTTON_Y,"lk":JOY_BUTTON_A,"hk":JOY_BUTTON_B,"throw":JOY_BUTTON_LEFT_SHOULDER,"pause":JOY_BUTTON_START,"confirm":JOY_BUTTON_A,"back":JOY_BUTTON_B}
+	var buttons={"left":JOY_BUTTON_DPAD_LEFT,"right":JOY_BUTTON_DPAD_RIGHT,"up":JOY_BUTTON_DPAD_UP,"down":JOY_BUTTON_DPAD_DOWN,"lp":JOY_BUTTON_X,"mp":JOY_BUTTON_Y,"hp":JOY_BUTTON_RIGHT_SHOULDER,"lk":JOY_BUTTON_A,"mk":JOY_BUTTON_B,"throw":JOY_BUTTON_LEFT_SHOULDER,"pause":JOY_BUTTON_START,"confirm":JOY_BUTTON_A,"back":JOY_BUTTON_B}
 	for action in buttons: result[action]={"button":buttons[action]}
+	result.hk={"axis":JOY_AXIS_TRIGGER_RIGHT,"sign":1}
+	result.throw_right={"axis":JOY_AXIS_TRIGGER_LEFT,"sign":1}
 	return result
 
 func mapping(id:int)->Dictionary:
-	return profiles.get(devices.get(id,""),defaults())
+	var identity=devices.get(id,"")
+	var saved:Dictionary=profiles.get(identity,{})
+	if saved.has("mp") and saved.has("mk") and saved.has("throw_right"): return saved
+	var result=defaults()
+	var name=identity.to_lower().replace("-","").replace(" ","")
+	if (slots.find(id)==0 and primary_layout=="retrobit") or "retrobit" in name:
+		# On Retro-Bit Bluetooth, physical Z and C report as trigger axes.
+		result.hp={"axis":JOY_AXIS_TRIGGER_LEFT,"sign":1}
+		result.throw_right={"button":JOY_BUTTON_RIGHT_SHOULDER}
+	# Preserve calibrated directions from older profiles. The former attack
+	# layout is replaced as a group to avoid duplicate face/shoulder mappings.
+	for direction in STEPS.slice(0,4):
+		if saved.has(direction): result[direction]=saved[direction]
+	return result
 
 func save_mapping(id:int,bindings:Dictionary)->Error:
 	if not devices.has(id): return ERR_DOES_NOT_EXIST
@@ -80,7 +99,7 @@ func directions(id:int)->Dictionary:
 	var right=active(id,binds.right)
 	var up=active(id,binds.up)
 	var down=active(id,binds.down)
-	if not profiles.has(devices.get(id,"")):
+	if not profiles.get(devices.get(id,""),{}).has("left"):
 		var x=axes.get(id,{}).get(JOY_AXIS_LEFT_X,0.0)
 		var y=axes.get(id,{}).get(JOY_AXIS_LEFT_Y,0.0)
 		left=left or x<-.4;right=right or x>.4

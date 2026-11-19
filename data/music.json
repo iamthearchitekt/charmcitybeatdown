@@ -1,0 +1,17 @@
+{
+  "title": "res://audio/title-street-of-rage.mp3",
+  "menu_volume_db": -11,
+  "match_volume_db": -13,
+  "levels": {
+    "INNER HARBOR DOCKS": "res://audio/loops/go-straight.ogg",
+    "DUNDALK DOCKS": "res://audio/loops/back-to-the-industry.ogg",
+    "GRAFFITI ALLEY": "res://audio/loops/alien-power.ogg",
+    "EUTAW STREET / CAMDEN YARDS": "res://audio/loops/go-straight.ogg",
+    "POWER PLANT LIVE!": "res://audio/loops/never-return-alive.ogg",
+    "FELLS POINT / CAR CRUSH": "res://audio/loops/alien-power.ogg",
+    "WESTMINSTER / POE'S GRAVE": "res://audio/loops/revenge-of-mr-x.ogg",
+    "BREWERS HILL": "res://audio/loops/back-to-the-industry.ogg",
+    "BREWERS HILL / KEG BREAK": "res://audio/loops/alien-power.ogg",
+    "DUNDALK / BOX BREAK": "res://audio/loops/back-to-the-industry.ogg"
+  }
+}

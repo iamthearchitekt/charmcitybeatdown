@@ -1,9 +1,19 @@
 CHARM CITY BEATDOWN - verification
-PASS Four selectable fighter appearances with two editable move sets
+PASS Fourteen fighter appearances with editable move sets
 PASS MARCUS full move kit and frame data
-PASS MAYA full move kit and frame data
+PASS BROOK LYNNE full move kit and frame data
 PASS ALEX full move kit and frame data
-PASS EMMA full move kit and frame data
+PASS LAUREN full move kit and frame data
+PASS CHELSEA full move kit and frame data
+PASS VIVIAN full move kit and frame data
+PASS SPIKE full move kit and frame data
+PASS ERIC full move kit and frame data
+PASS STAN full move kit and frame data
+PASS RACHEL full move kit and frame data
+PASS JEFF full move kit and frame data
+PASS EDGAR ALLAN POE full move kit and frame data
+PASS ORIOLE BIRD full move kit and frame data
+PASS LAMAR JACKSON full move kit and frame data
 PASS QCF priority, facing 1
 PASS Dragon punch priority, facing 1
 PASS QCF priority, facing -1
@@ -15,7 +25,8 @@ PASS Standing guard blocks overhead
 PASS Low attack defeats standing guard
 PASS Crouching guard blocks mid
 PASS Crouching guard blocks low
-PASS Overhead defeats crouching guard
+PASS High boot visibly above crouching head whiffs
+PASS Crouch guard still cannot block an overhead when it connects
 PASS Throw defeats guard
 PASS Simultaneous active contacts trade
 PASS Heavy punch has readable startup
@@ -46,10 +57,23 @@ PASS Double KO replays without awarding either player
 PASS Training regenerates health and never ends match
 PASS CPU selects legal moves and successfully fights across round resets
 PASS Normal CPU backs off and never walks into close pushbox pressure
+PASS CPU crouch-blocks some incoming shots and ignores shots moving away
+PASS CPU sometimes punishes a nearby missed heavy with a fast jab
+PASS Whiff punishment still respects the CPU cooldown
 PASS Fighter 1 atlas: 16 nonempty in-bounds transparent sprite regions
 PASS Fighter 2 atlas: 16 nonempty in-bounds transparent sprite regions
 PASS Fighter 3 atlas: 16 nonempty in-bounds transparent sprite regions
 PASS Fighter 4 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 5 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 6 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 7 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 8 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 9 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 10 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 11 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 12 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 13 atlas: 16 nonempty in-bounds transparent sprite regions
+PASS Fighter 14 atlas: 16 nonempty in-bounds transparent sprite regions
 PASS P1 keyboard light punch reaches live scene combat
 PASS P2 keyboard heavy punch reaches live scene combat
 PASS Right arrow moves Player 1 right

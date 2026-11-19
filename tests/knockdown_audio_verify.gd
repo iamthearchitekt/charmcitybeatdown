@@ -23,6 +23,7 @@ func run():
 	root.add_child(main)
 	await process_frame
 	main.set_physics_process(false)
+	main.set_process_input(false)
 	await create_timer(.08).timeout
 	check(main.menu_music.playing and main.menu_music.volume_db==-13 and not main.music.playing,"Title starts menu music at the increased level without the match track")
 	check(main.font.resource_path=="res://assets/fonts/UpheavalPro.ttf","All screens use bundled Upheaval Pro")
@@ -46,6 +47,10 @@ func run():
 				var a=sim.fighters[0];var b=sim.fighters[1]
 				a.x=640-60*side;b.x=640;a.facing=side;b.facing=-side
 				sim.apply_contact({"a":0,"b":1,"move":move,"m":sim.data.fighters[kind].moves[move],"block":false,"dir":side,"projectile":false})
+				if move=="throw":
+					check(b.grabbed_by==0,"Throw visibly captures before release")
+					sim.freeze=0
+					for i in Combat.GRAB_FRAMES: sim.step([{},{}])
 				check(b.state=="knockdown" and b.vx*side>=8 and b.vy<0,"Backward launch: kind "+str(kind)+", "+move+", direction "+str(side))
 				var landed=false;var rose=false;var land_count=0;var down_x=0.0
 				for frame in 100:
@@ -97,7 +102,9 @@ func run():
 	main.sim.phase="round_end";main.sim.phase_timer=1
 	main._physics_process(1.0/60.0)
 	await create_timer(.08).timeout
-	check(main.sim.phase=="results" and main.match_end_audio.playing and main.match_end_played,"Final KO goes directly to results and completion audio")
+	check(main.sim.phase=="results" and not main.match_end_audio.playing,"Results wait for the complete supplied final KO voice")
+	await create_timer(4.6).timeout;main.sync_match_end_audio()
+	check(main.match_end_audio.playing and main.match_end_played,"Completion audio starts after final KO audio ends")
 	var position=main.match_end_audio.get_playback_position()
 	for i in 20: main.sync_match_end_audio()
 	await create_timer(.08).timeout

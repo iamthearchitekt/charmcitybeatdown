@@ -14,6 +14,7 @@ func run():
 	root.add_child(main)
 	await process_frame
 	main.set_physics_process(false)
+	main.set_process_input(false)
 	main.selected_mode=1
 	main.begin_match()
 	var recorder=AudioEffectRecord.new()
@@ -37,6 +38,9 @@ func run():
 	for cue in ["light_punch","heavy_kick","block","projectile","ko_land","round_start"]:
 		main.sfx.play(cue)
 		await create_timer(.23).timeout
+	for cue in ["projectile_voice","hurricane_kick","spinning_kick","rapid_kick_hit"]:
+		main.sfx.play(cue)
+		await create_timer(.20).timeout
 	for i in 8: main.sfx.play("heavy_kick")
 	await create_timer(.9).timeout
 	for cue in ["ko_breakwater","ko_redline"]:
@@ -44,10 +48,10 @@ func run():
 		await create_timer(.08).timeout
 		check(main.sfx.voices.any(func(v):return v.playing and v.stream==main.sfx.streams[main.sfx.config.cues[cue].files[0]]),"Real audio driver plays "+cue+" defeat voice")
 		await create_timer(1.4).timeout
-	main.sfx.play("ko_breakwater");main.sfx.play("ko_redline")
+	main.sfx.play("final_ko_male");main.sfx.play("final_ko_female")
 	main.sfx.play("heavy_punch");main.sfx.play("heavy_kick")
 	main.sfx.play("ko_land");main.sfx.play("ko_land")
-	await create_timer(1.4).timeout
+	await create_timer(4.7).timeout
 	recorder.set_recording_active(false)
 	var recording=recorder.get_recording()
 	var peak=0

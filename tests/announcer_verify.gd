@@ -9,6 +9,21 @@ func check(ok:bool,label:String):
 func run():
 	main=load("res://main.tscn").instantiate();root.add_child(main);await process_frame
 	main.set_physics_process(false);main.begin_match()
+	main.set_process_input(false)
+	for number in [1,2,3]:
+		main.sim.new_match(0,1);main.sim.round_number=number
+		main.announcer.clear();main.announcer.playback_log.clear()
+		for frame in 40:
+			main.sim.step([{},{}])
+			for event in main.sim.events: main.dispatch_combat_event(event)
+		check(main.announcer.playback_log==["round"] and main.announcer.pending==[str(number)],"Intro starts ROUND then queues "+str(number))
+		await create_timer(main.announcer.clips.round.get_length()+.25).timeout
+		check(main.announcer.playback_log==["round",str(number)],"Round "+str(number)+" plays both source voice clips in sequence")
+		await create_timer(main.announcer.clips[str(number)].get_length()+.1).timeout
+		for frame in 110:
+			main.sim.step([{},{}])
+			for event in main.sim.events: main.dispatch_combat_event(event)
+		check(main.announcer.playback_log==["round",str(number),"fight"],"Fight follows the complete Round "+str(number)+" announcement")
 	main.dispatch_combat_event({"type":"fight"})
 	check(main.announcer.playing and main.announcer.playback_log[-1]=="fight","Fight voice plays on round start")
 	main.toggle_pause();check(main.announcer.stream_paused,"Announcer pauses with match")

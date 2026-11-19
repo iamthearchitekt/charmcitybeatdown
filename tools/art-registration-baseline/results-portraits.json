@@ -1,0 +1,212 @@
+{
+  "0": {
+    "path": "res://assets/results-portraits-a.png",
+    "victory": [
+      7,
+      19,
+      432,
+      418
+    ],
+    "defeat": [
+      8,
+      474,
+      431,
+      404
+    ]
+  },
+  "1": {
+    "path": "res://assets/female-results-refined.png",
+    "victory": [
+      18,
+      33,
+      348,
+      360
+    ],
+    "defeat": [
+      416,
+      31,
+      346,
+      362
+    ]
+  },
+  "2": {
+    "path": "res://assets/results-portraits-a.png",
+    "victory": [
+      896,
+      10,
+      414,
+      427
+    ],
+    "defeat": [
+      893,
+      466,
+      431,
+      412
+    ]
+  },
+  "3": {
+    "path": "res://assets/female-results-refined.png",
+    "victory": [
+      22,
+      432,
+      355,
+      356
+    ],
+    "defeat": [
+      432,
+      434,
+      331,
+      354
+    ]
+  },
+  "4": {
+    "path": "res://assets/female-results-refined.png",
+    "victory": [
+      43,
+      869,
+      305,
+      315
+    ],
+    "defeat": [
+      432,
+      870,
+      324,
+      314
+    ]
+  },
+  "5": {
+    "path": "res://assets/female-results-refined.png",
+    "victory": [
+      47,
+      1263,
+      288,
+      318
+    ],
+    "defeat": [
+      444,
+      1263,
+      305,
+      318
+    ]
+  },
+  "6": {
+    "path": "res://assets/spike-supplement-refined.png",
+    "victory": [
+      43,
+      489,
+      382,
+      379
+    ],
+    "defeat": [
+      466,
+      497,
+      424,
+      371
+    ]
+  },
+  "7": {
+    "path": "res://assets/results-portraits-c.png",
+    "victory": [
+      47,
+      23,
+      429,
+      470
+    ],
+    "defeat": [
+      47,
+      536,
+      418,
+      451
+    ]
+  },
+  "8": {
+    "path": "res://assets/results-portraits-c.png",
+    "victory": [
+      551,
+      36,
+      447,
+      457
+    ],
+    "defeat": [
+      532,
+      554,
+      458,
+      433
+    ]
+  },
+  "9": {
+    "path": "res://assets/female-results-refined.png",
+    "victory": [
+      42,
+      1616,
+      313,
+      358
+    ],
+    "defeat": [
+      429,
+      1617,
+      316,
+      357
+    ]
+  },
+  "10": {
+    "path": "res://assets/results-portraits-d.png",
+    "victory": [
+      627,
+      1,
+      603,
+      638
+    ],
+    "defeat": [
+      615,
+      650,
+      610,
+      620
+    ]
+  },
+  "11": {
+    "path": "res://assets/results-portraits-e.png",
+    "victory": [
+      115,
+      16,
+      661,
+      870
+    ],
+    "defeat": [
+      79,
+      926,
+      698,
+      834
+    ]
+  },
+  "12": {
+    "path": "res://assets/results-portraits-f.png",
+    "victory": [
+      131,
+      9,
+      761,
+      750
+    ],
+    "defeat": [
+      71,
+      801,
+      873,
+      716
+    ]
+  },
+  "13": {
+    "path": "res://assets/results-portraits-g.png",
+    "victory": [
+      122,
+      6,
+      748,
+      762
+    ],
+    "defeat": [
+      110,
+      768,
+      820,
+      755
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-[gd_resource type="AudioBusLayout" load_steps=2 format=3]
+[gd_resource type="AudioBusLayout" load_steps=2 format=3 uid="uid://jilnb57r4p8"]
 
 [sub_resource type="AudioEffectHardLimiter" id="AudioEffectHardLimiter_master"]
 resource_name = "Master peak limiter"
@@ -6,8 +6,5 @@ ceiling_db = -1.2
 release = 0.08
 
 [resource]
-bus/0/name = &"Master"
-bus/0/volume_db = 0.0
-bus/0/send = &""
 bus/0/effect/0/effect = SubResource("AudioEffectHardLimiter_master")
 bus/0/effect/0/enabled = true

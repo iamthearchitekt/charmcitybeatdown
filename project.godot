@@ -2,9 +2,11 @@ config_version=5
 
 [application]
 config/name="CHARM CITY BEATDOWN"
-run/main_scene="res://main.tscn"
+run/main_scene="res://startup.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/description="Midnight at the harbor. An original Baltimore arcade fighter."
+config/icon="res://assets/game-icon.png"
+config/windows_native_icon="res://assets/charm-city-beatdown.ico"
 
 [display]
 window/size/viewport_width=1280
