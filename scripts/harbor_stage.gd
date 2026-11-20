@@ -10,7 +10,18 @@ var crows=GraveyardCrows.new()
 var crow_start_time=-1.0
 var rat=HarborRat.new()
 var rat_start_time=-1.0
-const STAGE_NAMES=["INNER HARBOR DOCKS","DUNDALK DOCKS","GRAFFITI ALLEY","EUTAW STREET / CAMDEN YARDS","POWER PLANT LIVE!","WESTMINSTER / POE'S GRAVE","BREWERS HILL"]
+const INNER_HARBOR=0
+const FELLS_POINT=7
+const STADIUM=8
+const PIMLICO=9
+const WAREHOUSE=10
+const STAGE_NAMES=["INNER HARBOR DOCKS","DUNDALK DOCKS","GRAFFITI ALLEY","EUTAW STREET / CAMDEN YARDS","POWER PLANT LIVE!","WESTMINSTER / POE'S GRAVE","BREWERS HILL","FELLS POINT","M&T BANK STADIUM / TAILGATE","PIMLICO / INFIELD","WAREHOUSE"]
+const HOME_STAGES={
+	"alex":WAREHOUSE,"lauren":INNER_HARBOR,"jeff":INNER_HARBOR,
+	"marcus":1,"rachel":1,"eric":PIMLICO,"stan":PIMLICO,
+	"chelsea":2,"orioles-mascot":3,"brook-lynne":4,"edgar-allan-poe":5,
+	"spike":6,"vivian":FELLS_POINT,"lamar-jackson":STADIUM,
+}
 const GRAFFITI_WINDOW_REGIONS=[Rect2(715,365,77,79),Rect2(625,378,46,104),Rect2(1006,415,77,31),Rect2(1132,400,43,46)]
 const CAMDEN_CROWD_REGIONS=[Rect2(44,478,222,116),Rect2(366,499,168,95),Rect2(534,466,702,128),Rect2(1327,499,34,47),Rect2(1498,499,114,95)]
 const POWERPLANT_NEON_REGIONS=[Rect2(687,126,537,87),Rect2(47,278,331,147),Rect2(479,350,311,105),Rect2(1250,283,332,157)]
@@ -46,6 +57,13 @@ var bonus_kind="car"
 var at_brewers=false
 var brewers:Texture2D
 var brewers_material:ShaderMaterial
+var stadium:Texture2D
+var stadium_material:ShaderMaterial
+var pimlico:Texture2D
+var pimlico_material:ShaderMaterial
+var warehouse:Texture2D
+var warehouse_material:ShaderMaterial
+var stage_index=INNER_HARBOR
 
 func set_bonus(enabled:bool,kind:String="car"):
 	bonus_kind=kind
@@ -58,19 +76,20 @@ func set_bonus(enabled:bool,kind:String="car"):
 
 func stage_name()->String:
 	if at_bonus: return {"car":"FELLS POINT / CAR CRUSH","kegs":"BREWERS HILL / KEG BREAK","boxes":"DUNDALK / BOX BREAK"}[bonus_kind]
-	if at_brewers: return STAGE_NAMES[6]
-	if at_graveyard: return STAGE_NAMES[5]
-	return STAGE_NAMES[4] if at_powerplant else (STAGE_NAMES[3] if at_camden else (STAGE_NAMES[2] if at_graffiti else (STAGE_NAMES[1] if at_seagirt else STAGE_NAMES[0])))
+	return STAGE_NAMES[stage_index]
 
 func current_index()->int:
-	if at_brewers: return 6
-	if at_graveyard: return 5
-	if at_powerplant: return 4
-	if at_camden: return 3
-	if at_graffiti: return 2
-	return 1 if at_seagirt else 0
+	return stage_index
+
+static func home_stage(fighter_id:String)->int:
+	return HOME_STAGES.get(fighter_id,INNER_HARBOR)
+
+func stage_textures()->Array[Texture2D]:
+	return [background,docks,graffiti,camden,powerplant,graveyard,brewers,bonus_texture,stadium,pimlico,warehouse]
 
 func set_stage(index:int):
+	index=clampi(index,0,STAGE_NAMES.size()-1)
+	stage_index=index
 	rat_start_time=-1.0
 	crow_start_time=-1.0
 	at_bonus=false
@@ -80,9 +99,8 @@ func set_stage(index:int):
 	at_powerplant=index==4
 	at_graveyard=index==5
 	at_brewers=index==6
-	backdrop.texture=graveyard if at_graveyard else (powerplant if at_powerplant else (camden if at_camden else (graffiti if at_graffiti else (docks if at_seagirt else background))))
-	backdrop.material=graveyard_material if at_graveyard else (powerplant_material if at_powerplant else (camden_material if at_camden else (graffiti_material if at_graffiti else (docks_material if at_seagirt else water_material))))
-	if at_brewers: backdrop.texture=brewers;backdrop.material=brewers_material
+	backdrop.texture=stage_textures()[stage_index]
+	backdrop.material=[water_material,docks_material,graffiti_material,camden_material,powerplant_material,graveyard_material,brewers_material,bonus_material,stadium_material,pimlico_material,warehouse_material][stage_index]
 	layout_backdrop()
 
 func set_panorama(enabled:bool):
@@ -97,6 +115,10 @@ func layout_backdrop():
 	var scale_factor=1.0+2.0*margin/VIEW_WIDTH
 	backdrop.position=Vector2(-margin,FIGHT_FLOOR*(1.0-scale_factor))
 	backdrop.scale=Vector2(VIEW_WIDTH,VIEW_HEIGHT)*scale_factor/backdrop.texture.get_size()
+	if stage_index in [STADIUM,PIMLICO] and not at_bonus:
+		# Keep the venue signage and upper animation visible below the fixed HUD.
+		backdrop.position.y=0.0
+		backdrop.scale.y=VIEW_HEIGHT/backdrop.texture.get_height()
 
 static func camera_target(left:float,right:float)->float:
 	var center=(left+right)*.5-VIEW_WIDTH*.5
@@ -106,21 +128,24 @@ static func camera_target(left:float,right:float)->float:
 
 func select_random():
 	# One Harbor opener per application session; returning to menus never resets it.
-	var history=ConfigFile.new()
 	if not history_loaded:
+		var history=ConfigFile.new()
 		if history.load(history_path)==OK:
 			last_stage=int(history.get_value("stages","last_stage",-1))
-		history_loaded=true
 	var choices=[]
 	for index in STAGE_NAMES.size():
 		if index!=last_stage: choices.append(index)
-	var next_stage=0 if first_match_pending else int(choices.pick_random())
+	select_match(INNER_HARBOR if first_match_pending else int(choices.pick_random()))
+
+func select_match(index:int):
+	set_stage(index)
 	first_match_pending=false
-	last_stage=next_stage
+	history_loaded=true
+	last_stage=stage_index
+	var history=ConfigFile.new()
 	history.set_value("stages","last_stage",last_stage)
 	var saved=history.save(history_path)
 	if saved!=OK: push_warning("Could not save stage history: "+error_string(saved))
-	set_stage(next_stage)
 
 static func water_frame(t:float)->int:
 	return int(floor(t*4.0))%2
@@ -130,11 +155,33 @@ func draw_ambient(canvas:Node2D,t:float):
 		if crow_start_time<0: crow_start_time=t
 		crows.draw(canvas,t-crow_start_time)
 		return
-	if at_bonus or at_seagirt or at_graffiti or at_camden or at_powerplant or at_brewers: return
+	if at_bonus or stage_index not in [INNER_HARBOR,1]: return
 	if rat_start_time<0: rat_start_time=t
 	rat.draw(canvas,t-rat_start_time)
 
 func attach(parent:Node2D):
+	var warehouse_image=Image.new()
+	var warehouse_loaded=warehouse_image.load_png_from_buffer(FileAccess.get_file_as_bytes("res://assets/warehouse.png"))
+	if warehouse_loaded!=OK: push_error("Could not load Warehouse: "+error_string(warehouse_loaded))
+	else: warehouse=ImageTexture.create_from_image(warehouse_image)
+	warehouse_material=ShaderMaterial.new()
+	warehouse_material.shader=preload("res://scripts/warehouse_beacon.gdshader")
+	var pimlico_image=Image.new()
+	var pimlico_loaded=pimlico_image.load_png_from_buffer(FileAccess.get_file_as_bytes("res://assets/pimlico-infield.png"))
+	if pimlico_loaded!=OK: push_error("Could not load Pimlico Infield: "+error_string(pimlico_loaded))
+	else: pimlico=ImageTexture.create_from_image(pimlico_image)
+	pimlico_material=ShaderMaterial.new()
+	pimlico_material.shader=preload("res://scripts/pimlico_wind.gdshader")
+	var stadium_image=Image.new()
+	var stadium_loaded=stadium_image.load_png_from_buffer(FileAccess.get_file_as_bytes("res://assets/mt-bank-stadium.png"))
+	if stadium_loaded!=OK: push_error("Could not load M&T Bank Stadium: "+error_string(stadium_loaded))
+	else: stadium=ImageTexture.create_from_image(stadium_image)
+	var cheer_image=Image.new()
+	var cheer_loaded=cheer_image.load_png_from_buffer(FileAccess.get_file_as_bytes("res://assets/mt-bank-stadium-cheer.png"))
+	if cheer_loaded!=OK: push_error("Could not load the stadium cheer frame: "+error_string(cheer_loaded))
+	stadium_material=ShaderMaterial.new()
+	stadium_material.shader=preload("res://scripts/stadium_cheer.gdshader")
+	if cheer_loaded==OK: stadium_material.set_shader_parameter("gestures",ImageTexture.create_from_image(cheer_image))
 	var brewers_image=Image.new()
 	brewers_image.load_png_from_buffer(FileAccess.get_file_as_bytes("res://assets/brewers-hill.png"))
 	brewers=ImageTexture.create_from_image(brewers_image)
@@ -160,8 +207,29 @@ void fragment() {
 	graveyard_shader.code="""
 shader_type canvas_item;
 uniform int water_frame=0;
+uniform sampler2D granite_art : filter_nearest, repeat_disable;
+// Cover only the painted inscription panels with the surrounding granite tones.
+vec3 bare_granite(vec3 base,vec2 p,vec4 bounds,vec3 tone,vec2 grain_origin) {
+    vec2 edge=min(p-bounds.xy,bounds.zw-p);
+    float coverage=smoothstep(0.0,5.0,min(edge.x,edge.y));
+    if (coverage<=0.0) { return base; }
+    vec2 q=(p-bounds.xy)/(bounds.zw-bounds.xy);
+    vec2 grain_uv=(floor(grain_origin+q*vec2(17.0,29.0))+vec2(.5))/vec2(1672.0,941.0);
+    float grain=texture(granite_art,grain_uv).r-texture(granite_art,grain_origin/vec2(1672.0,941.0)).r;
+    float speckle=fract(sin(dot(floor(p),vec2(127.1,311.7)))*43758.5453)-.5;
+    return mix(base,tone+(.05*q.y-.025)+grain*.47+speckle*.032,coverage);
+}
 void fragment() {
     vec4 base=texture(TEXTURE,UV);
+    vec2 p=UV*vec2(1672.0,941.0);
+    base.rgb=bare_granite(base.rgb,p,vec4(249.0,558.0,279.0,600.0),vec3(.34,.38,.40),vec2(253.0,601.0));
+    base.rgb=bare_granite(base.rgb,p,vec4(374.0,560.0,401.0,590.0),vec3(.46,.46,.43),vec2(488.0,649.0));
+    base.rgb=bare_granite(base.rgb,p,vec4(585.0,578.0,618.0,605.0),vec3(.25,.29,.29),vec2(594.0,611.0));
+    base.rgb=bare_granite(base.rgb,p,vec4(682.0,585.0,726.0,657.0),vec3(.43,.43,.38),vec2(529.0,649.0));
+    base.rgb=bare_granite(base.rgb,p,vec4(887.0,577.0,917.0,613.0),vec3(.41,.42,.39),vec2(488.0,649.0));
+    base.rgb=bare_granite(base.rgb,p,vec4(971.0,567.0,1013.0,632.0),vec3(.47,.47,.43),vec2(993.0,632.0));
+    base.rgb=bare_granite(base.rgb,p,vec4(1046.0,534.0,1081.0,591.0),vec3(.33,.35,.36),vec2(865.0,618.0));
+    base.rgb=bare_granite(base.rgb,p,vec4(1376.0,559.0,1407.0,598.0),vec3(.39,.41,.41),vec2(1385.0,602.0));
     // Two matching storm-cloud light states; graves, trees and church stay fixed.
     float gray=1.0-smoothstep(.035,.12,max(base.r,max(base.g,base.b))-min(base.r,min(base.g,base.b)));
     float clouds=(1.0-smoothstep(.105,.145,UV.y))*smoothstep(.12,.28,base.r)*gray;
@@ -171,6 +239,7 @@ void fragment() {
 """
 	graveyard_material=ShaderMaterial.new()
 	graveyard_material.shader=graveyard_shader
+	graveyard_material.set_shader_parameter("granite_art",graveyard)
 	var bonus_image=Image.new()
 	bonus_image.load_png_from_buffer(FileAccess.get_file_as_bytes("res://assets/fells-point.png"))
 	bonus_texture=ImageTexture.create_from_image(bonus_image)
@@ -450,8 +519,17 @@ void fragment() {
 	parent.add_child(backdrop)
 
 func draw(canvas:Node2D,t:float):
-	if at_bonus and bonus_kind=="car":
+	if (at_bonus and bonus_kind=="car") or stage_index==FELLS_POINT:
 		bonus_material.set_shader_parameter("water_frame",water_frame(t))
+		return
+	if stage_index==STADIUM:
+		stadium_material.set_shader_parameter("water_frame",water_frame(t))
+		return
+	if stage_index==PIMLICO:
+		pimlico_material.set_shader_parameter("wind_frame",water_frame(t))
+		return
+	if stage_index==WAREHOUSE:
+		warehouse_material.set_shader_parameter("beacon_frame",water_frame(t))
 		return
 	if water_material: water_material.set_shader_parameter("water_frame",water_frame(t))
 	if docks_material: docks_material.set_shader_parameter("water_frame",water_frame(t))

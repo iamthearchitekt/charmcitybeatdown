@@ -6,6 +6,8 @@ var intent:Dictionary={}
 var burst:int=0
 var rest:int=0
 var approach:int=0
+var approach_limit:float=155.0
+var next_projectile_tick:int=0
 var observed_move=""
 var observed_frame=-1
 var repeated_move=""
@@ -18,6 +20,7 @@ func _init(): rng.seed=3701
 func control(sim,slot:int,difficulty:int)->Dictionary:
 	var me=sim.fighters[slot]
 	var foe=sim.fighters[1-slot]
+	var poe=me.kind==11
 	var out={"dx":0,"down":false,"up":false,"back":false,"command":""}
 	if sim.phase!="fight" or sim.freeze>0: return out
 	if me.grabbed_by>=0:
@@ -64,7 +67,7 @@ func control(sim,slot:int,difficulty:int)->Dictionary:
 		return out
 	reaction-=1
 	if reaction<=0:
-		reaction=[23,15,9][difficulty]+rng.randi_range(0,7)
+		reaction=[23,15,9][difficulty]+rng.randi_range(0,7)-(2 if poe else 0)
 		var foe_move=sim.move_data(foe)
 		var reach=(float(foe_move.box[0])+float(foe_move.box[2]))*sim.FIGHTER_SCALE+35 if not foe_move.is_empty() else 185.0
 		var predictable=repeat_count>=3 and foe.move==repeated_move
@@ -72,63 +75,89 @@ func control(sim,slot:int,difficulty:int)->Dictionary:
 		var melee_threat=foe.move!="" and not recovering and distance<minf(310,reach)
 		var incoming_shot=projectile_approaching(sim,me,slot,[11,17,22][difficulty])
 		var target_parts=sim.hurtboxes(foe)
+		var kit:Dictionary=sim.data.fighters[me.kind].moves
 		intent={"dx":0,"down":false,"up":false,"back":false,"command":""}
+		approach_limit=155.0
 		var punish=""
 		if recovering and not incoming_shot and cooldown==0 and distance<200 and (not foe.connected or predictable):
-			var chance=[.24,.47,.63][difficulty]+(.12 if predictable else 0.0)
+			var chance=[.24,.54,.69][difficulty]+(.12 if predictable else 0.0)
 			if rng.randf()<chance:
-				for move in ["lp","mp","hp"]:
+				var counters=["lp","mp","hp"]
+				if difficulty>0 and distance<150 and me.y>=Combat.FLOOR:
+					var recovery_left=int(foe_move.startup+foe_move.active+foe_move.recovery)-foe.frame
+					var heavies=["hp","hk"].filter(func(move): return int(kit[move].startup)+4<=recovery_left)
+					counters=heavies+["lp","mp"]
+				for move in counters:
 					if normal_in_reach(sim,me,target_parts,move):
 						punish=move
 						break
 		if punish!="":
 			intent.command=punish
-		elif (melee_threat or incoming_shot) and rng.randf()<minf(.92,[.37,.64,.82][difficulty]+(.16 if predictable else 0.0)):
+		elif (melee_threat or incoming_shot) and rng.randf()<minf(.94,[.44,.70,.86][difficulty]+(.16 if predictable else 0.0)+(.04 if poe else 0.0)):
 			intent.back=true
-			intent.dx=-me.facing
+			# A deliberate guard holds ground. Let a retreat already underway finish.
+			intent.dx=-me.facing if me.backstep>0 else 0
 			intent.down=foe_move.get("level","")=="low" if melee_threat else incoming_shot
 		elif distance>185:
-			intent.dx=me.facing
-			approach=[8,10,12][difficulty]
-			if rng.randf()<.13: intent.up=true
-			if cooldown==0 and distance>230 and me.kind!=4 and rng.randf()<.25:
-				if me.kind==10: intent.command="special5" if foe.guard and not foe.crouch else "special1"
-				elif me.kind==0 and distance<290: intent.command="special6" if foe.guard else "special5"
-				else: intent.command="special1"
+			var shot_chance=[.45,.56,.66][difficulty]+(.11 if poe else 0.0)
+			if cooldown==0 and distance>=230 and sim.tick>=next_projectile_tick and not incoming_shot and rng.randf()<shot_chance:
+				intent.command=ranged_attack(sim,me,foe,kit,target_parts)
+			if cooldown==0 and intent.command=="" and distance<350 and not (melee_threat or incoming_shot) and rng.randf()<.34:
+				var lunge="special6" if me.kind==0 and foe.guard and not foe.crouch else ("special5" if me.kind==0 else "special1")
+				if kit[lunge].get("travel",0.0)>0.0 and normal_in_reach(sim,me,target_parts,lunge): intent.command=lunge
+			if intent.command=="":
+				intent.dx=me.facing
+				approach=reaction
+				if distance>280 and rng.randf()<.10: intent.up=true
 		elif cooldown==0:
 			var choices=["lp","lk","mp","mk","hp","hk"] if distance<150 else ["mp","hp","hk"]
-			choices=choices.filter(func(move): return normal_in_reach(sim,me,target_parts,move))
-			var kit=sim.data.fighters[me.kind].moves
-			if kit.has("special3") and distance<(155 if me.kind==6 else (265 if me.kind==10 else 215)) and rng.randf()<.30: choices.append("special3")
-			if kit.has("special4") and distance<250 and rng.randf()<.20: choices.append("special4")
-			if rng.randf()<.18: choices.append("special1")
+			var low_poke=foe.guard and not foe.crouch and rng.randf()<.46
+			if low_poke: choices=["lk","mk","hk"]
+			choices=choices.filter(func(move): return normal_in_reach(sim,me,target_parts,move,low_poke))
+			if not low_poke:
+				for move in ["special1","special3","special4"]:
+					if kit.has(move) and not kit[move].get("projectile",false) and rng.randf()<.20 and normal_in_reach(sim,me,target_parts,move):
+						choices.append(move)
 			if distance<125 and sim.valid_grab(me,foe): choices.append("throw")
 			if kit.has("command_grab") and distance<145 and sim.valid_grab(me,foe) and rng.randf()<.18: choices.append("command_grab")
 			if kit.has("air_throw") and me.y<sim.FLOOR-1 and foe.y<sim.FLOOR-1: choices.append("throw")
-			if foe.y<sim.FLOOR-20: choices=["special2","hp"]
+			if foe.y<sim.FLOOR-20 and normal_in_reach(sim,me,target_parts,"special2"): choices.append("special2")
 			if not choices.is_empty():
 				intent.command=choices[rng.randi_range(0,choices.size()-1)]
-				intent.down=rng.randf()<.15
-			elif distance<155:
-				intent.dx=-me.facing
-				intent.back=true
-			else:
+				intent.down=low_poke and intent.command in ["lk","mk","hk"]
+			elif distance>Combat.PUSH_WIDTH+9.0:
+				# Step through the old dead zone only when none of the pokes can reach.
+				approach_limit=Combat.PUSH_WIDTH+9.0
 				intent.dx=me.facing
-				approach=[8,10,12][difficulty]
+				approach=mini(7,reaction)
 		else:
 			intent.dx=-me.facing if distance<130 else 0
 			intent.back=intent.dx!=0
 		if intent.command!="":
 			cooldown=[22,15,8][difficulty]+rng.randi_range(0,9)
-			burst+=1
+			if kit[intent.command].get("projectile",false): next_projectile_tick=sim.tick+[108,94,80][difficulty]
+			else: burst+=1
 	out=intent.duplicate()
 	intent.command=""
 	intent.up=false
 	# Approach in brief steps; never keep walking into the opponent's pushbox.
 	if out.dx==me.facing:
-		if distance<155 or approach<=0: out.dx=0
+		if distance<approach_limit or approach<=0: out.dx=0
 		else: approach-=1
 	return out
+
+func ranged_attack(sim,me:Dictionary,foe:Dictionary,kit:Dictionary,target_parts:Array)->String:
+	if target_parts.is_empty() or me.y<Combat.FLOOR-1: return ""
+	if sim.projectiles.any(func(shot): return shot.owner==me.slot and shot.life>0): return ""
+	var candidates:Array=[]
+	for move in kit:
+		if not kit[move].get("projectile",false): continue
+		var shot=Combat.make_projectile(me,kit[move])
+		var lane=Combat.projectile_rect(shot)
+		if target_parts.any(func(part): return part.end.y>lane.position.y and part.position.y<lane.end.y):
+			if foe.guard and not foe.crouch and kit[move].level=="low": return move
+			candidates.append(move)
+	return candidates[0] if not candidates.is_empty() else ""
 
 func projectile_approaching(sim,me:Dictionary,slot:int,lookahead:int)->bool:
 	var body:Rect2=sim.hurtbox(me)
@@ -142,11 +171,15 @@ func projectile_approaching(sim,me:Dictionary,slot:int,lookahead:int)->bool:
 			return true
 	return false
 
-func normal_in_reach(sim,me:Dictionary,target_parts:Array,move:String)->bool:
+func normal_in_reach(sim,me:Dictionary,target_parts:Array,move:String,crouch:bool=false)->bool:
 	if target_parts.is_empty(): return false
 	var probe=me.duplicate()
-	probe.crouch=false
+	probe.crouch=crouch
 	probe.move=sim.legal_command(probe,move)
+	if probe.move=="": return false
 	var data=sim.move_data(probe)
-	probe.frame=data.startup
-	return sim.regions_overlap(sim.attackboxes(probe,data),target_parts).has_area()
+	for frame in range(int(data.startup),int(data.startup+data.active)):
+		probe.frame=frame
+		if sim.regions_overlap(sim.attackboxes(probe,data),target_parts).has_area(): return true
+		probe.x+=float(data.get("travel",0.0))*me.facing
+	return false

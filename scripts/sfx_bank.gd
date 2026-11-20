@@ -17,7 +17,7 @@ func _ready():
 	config=JSON.parse_string(FileAccess.get_file_as_string("res://audio/sfx-map.json"))
 	for cue in config.cues:
 		for file in config.cues[cue].files:
-			if not streams.has(file): streams[file]=raw_wav(config.base_path+file) if "fighter-voices" in file or file in ["58_break_glass.wav","45_dhalsim_flame.wav","47_shoto_hadoken.wav","49_shoto_tatsumakisenpuukyaku.wav","4A_chunli_spinningbirdkick.wav","5B_zap_1.wav","5C_zap_2.wav","5D_whoosh_2.wav","5E_zap_3.wav"] else load(config.base_path+file)
+			if not streams.has(file): streams[file]=raw_wav(config.base_path+file) if "fighter-voices" in file or file in ["58_break_glass.wav","45_dhalsim_flame.wav","46_guile_sonicboom.wav","47_shoto_hadoken.wav","49_shoto_tatsumakisenpuukyaku.wav","4A_chunli_spinningbirdkick.wav","5B_zap_1.wav","5C_zap_2.wav","5D_whoosh_2.wav","5E_zap_3.wav"] else load(config.base_path+file)
 	for i in VOICES:
 		var player=AudioStreamPlayer.new()
 		add_child(player)
@@ -133,7 +133,7 @@ static func attack_cue(event:Dictionary)->String:
 func combat_event(event:Dictionary,sim):
 	match event.type:
 		"projectile_clash": play("special_hit")
-		"projectile_spawn": play("projectile_voice")
+		"projectile_spawn": play(event.get("voice","projectile_voice"))
 		"attack": play(attack_cue(event))
 		"electric_pulse": play("electric_pulse")
 		"hit": play(impact_cue(event))

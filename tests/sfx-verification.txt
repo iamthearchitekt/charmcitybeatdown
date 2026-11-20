@@ -1,4 +1,4 @@
-PASS All 36 active effects and voice WAVs decode
+PASS All 37 active effects and voice WAVs decode
 PASS Playback pool is bounded to eight voices
 PASS One matching impact cue for lp
 PASS One matching impact cue for hp
@@ -12,6 +12,7 @@ PASS Whiff produces one whoosh and no impact
 PASS Blocked contact produces block cue instead of damage cue
 PASS Projectile launch and delayed contact have distinct cues
 PASS Hadouken voice plays once on actual plasma-ball spawn
+PASS Eric's projectile plays the supplied Sonic Boom on launch
 PASS Live Wire zaps throughout a whiffed active burst
 PASS Live Wire uses the longer, audible supplied zap
 PASS Chelsea casts with the Flame sample and whoosh layer even on a whiff

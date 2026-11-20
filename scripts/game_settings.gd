@@ -1,6 +1,7 @@
 extends RefCounted
 
 const PATH="user://game-settings.cfg"
+const SPEED_SETTING_VERSION=2
 
 static func read()->ConfigFile:
 	var config=ConfigFile.new()
@@ -8,6 +9,11 @@ static func read()->ConfigFile:
 	if error!=OK and error!=ERR_FILE_NOT_FOUND:
 		push_warning("Could not load game settings: "+error_string(error))
 		config.clear()
+	if int(config.get_value("gameplay","speed_setting_version",1))<SPEED_SETTING_VERSION:
+		# The old Turbo pace is now Normal. Preserve that pace until Turbo is enabled again.
+		config.set_value("gameplay","turbo",false)
+		config.set_value("gameplay","speed_setting_version",SPEED_SETTING_VERSION)
+		if error==OK: save(config)
 	return config
 
 static func apply_system_settings(config:ConfigFile):

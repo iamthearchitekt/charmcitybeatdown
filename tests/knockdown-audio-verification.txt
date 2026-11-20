@@ -1,4 +1,4 @@
-PASS Title starts menu music at its configured level without the match track
+FAIL Title starts menu music at the increased level without the match track
 PASS All screens use bundled Upheaval Pro
 PASS Character selection continues menu music without restarting
 PASS Starting a match cuts menu music before match music begins
@@ -51,5 +51,5 @@ PASS A second completed match triggers completion audio again
 PASS Returning to title stops both tracks
 PASS Returning to title restarts menu music
 PASS Music toggle also silences menu music
-PASS Non-decisive rounds do not trigger final-KO slow motion
-Failures: 11
+FAIL Non-decisive rounds do not trigger final-KO slow motion
+Failures: 13

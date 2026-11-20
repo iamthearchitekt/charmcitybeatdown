@@ -2,6 +2,8 @@ extends SceneTree
 const Combat=preload("res://scripts/combat.gd")
 const CPU=preload("res://scripts/cpu.gd")
 const Commands=preload("res://scripts/commands.gd")
+const Pose=preload("res://scripts/combat_pose.gd")
+const Sparks=preload("res://scripts/impact_sparks.gd")
 var checks=0
 var failures=0
 func _initialize(): call_deferred("run")
@@ -48,11 +50,17 @@ func test_plasma(s,kind:int,facing:int,guard:bool):
 		if result!="": break
 	if guard:
 		var stays_grounded=result=="block" and defender.state=="block" and defender.health==1000-int(move.chip)
+		var contact_x=float(defender.x)
+		var frozen=true
+		for frame in s.freeze:
+			s.step([{}, {"back":true}])
+			frozen=frozen and is_equal_approx(defender.x,contact_x)
 		for frame in 20:
 			s.step([{},{"back":true}])
 			stays_grounded=stays_grounded and is_equal_approx(defender.y,Combat.FLOOR)
 		var distance=(defender.x-start_x)*facing
-		check(stays_grounded and distance>24 and distance<64,"Guard slides without falling against plasma: "+str(kind))
+		var slide=(defender.x-contact_x)*facing
+		check(frozen and stays_grounded and slide>30 and distance<100,"Guard freezes at impact, then slides visibly without falling: %d (%.1f px)" % [kind,slide])
 	elif not move.get("projectile_knockdown",true):
 		var standing=result=="hit" and defender.state=="hit" and defender.health==1000-int(move.damage)
 		for frame in 18:
@@ -69,17 +77,36 @@ func test_plasma(s,kind:int,facing:int,guard:bool):
 		var distance=(defender.x-start_x)*facing
 		check(falls and defender.state=="down" and distance>45 and distance<95 and peak>Combat.FLOOR-40,"Clean plasma causes a short backward fall: "+str(kind))
 
-func guard_distance(s,move:String)->float:
+func measure_guard(s,move:String,facing:int=1,low:bool=false,corner:bool=false)->Dictionary:
 	s.new_match(0,0)
 	s.phase="fight"
-	s.fighters[0].x=500
 	var defender=s.fighters[1]
-	defender.x=612
-	var blocked=false
+	defender.x=(Combat.RIGHT if facing>0 else Combat.LEFT) if corner else 640+56*facing
+	s.fighters[0].x=defender.x-112*facing
+	var guard={"back":true,"down":low}
+	var block_event:Dictionary={}
 	for frame in 32:
-		s.step([{"command":move} if frame==0 else {},{"back":true}])
-		blocked=blocked or s.events.any(func(e): return e.type=="block")
-	return defender.x-612 if blocked and defender.health==1000 else 0.0
+		s.step([{"command":move} if frame==0 else {},guard])
+		for event in s.events:
+			if event.type=="block": block_event=event
+		if not block_event.is_empty(): break
+	if block_event.is_empty(): return {"slide":0.0,"early_slide":0.0,"locked":false,"rigid":false,"stop":0,"recovered":false}
+	var contact_x=float(defender.x)
+	var base=Pose.key(defender,{})
+	var stop:int=s.freeze
+	var locked=defender.health==1000 and base==("base:8" if low else "base:12")
+	var rigid=Pose.impact_shear(defender)==0.0
+	for frame in stop:
+		s.step([{},guard])
+		locked=locked and is_equal_approx(defender.x,contact_x) and Pose.key(defender,{})==base
+		rigid=rigid and Pose.impact_shear(defender)==0.0
+	var early_slide=0.0
+	for frame in 18:
+		s.step([{},guard])
+		rigid=rigid and Pose.impact_shear(defender)==0.0 and Pose.key(defender,{})==base
+		if frame==3: early_slide=(defender.x-contact_x)*facing
+	return {"slide":(defender.x-contact_x)*facing,"early_slide":early_slide,"locked":locked,"rigid":rigid,
+		"stop":stop,"spark_life":Sparks.lifetime(block_event),"recovered":defender.state=="idle"}
 
 func guarded_followup(s,kind:int,first:String,second:String,facing:int)->bool:
 	s.new_match(kind,0)
@@ -144,6 +171,14 @@ func run():
 	var s=setup()
 	hit(s,"lp")
 	check(s.fighters[1].dizzy_build==45 and not s.fighters[1].dizzy_pending,"A jab gives ordinary hitstun and cannot cause dizzy")
+	s=setup();hit(s,"hp")
+	var defender=s.fighters[1]
+	var stun:int=defender.stun
+	for frame in stun:
+		s.step([{}, {"command":"hk"} if frame==0 else {}])
+	check(defender.move=="" and defender.stun==0,"A recovery kick cannot interrupt hitstun")
+	s.step([{},{}])
+	check(defender.move=="hk","A kick pressed early in hitstun starts on the first free tick")
 	s=setup();s.fighters[1].dizzy_build=299;hit(s,"special1",true)
 	check(s.fighters[1].dizzy_build==0 and not s.fighters[1].dizzy_pending,"A blocked special breaks the dizzy combo and adds no stun")
 	s=setup();hit(s,"throw")
@@ -170,7 +205,7 @@ func run():
 	check(not s.start_move(s.fighters[1],"lp"),"Direct move starts cannot bypass dizzy")
 	var timer=s.fighters[1].dizzy_timer;s.freeze=5
 	for i in 5: s.step([{}, {"command":"lp"}])
-	check(s.fighters[1].dizzy_timer==timer and s.fighters[1].queued=="","Hitstop freezes dizzy and does not buffer an escape attack")
+	check(s.fighters[1].dizzy_timer==timer and s.fighters[1].move=="","Hitstop freezes dizzy and cannot start an escape attack")
 	hit(s)
 	check(s.fighters[1].state=="hit" and s.fighters[1].dizzy_timer==0 and s.fighters[1].dizzy_immunity>0,"A punish ends dizzy and protects against immediate redizzy")
 	check(s.fighters[1].dizzy_build==0,"The first punish cannot immediately rebuild dizzy")
@@ -178,6 +213,14 @@ func run():
 	check(ordinary==180,"Dizzy expires naturally after 180 simulation frames")
 	check(held>=176,"Holding one direction does not repeatedly shorten recovery")
 	check(mashed>=60 and mashed<ordinary,"Distinct movement/button taps accelerate recovery with a one-second floor")
+	s=setup();s.begin_dizzy(s.fighters[1])
+	defender=s.fighters[1]
+	s.step([{}, {"command":"lp"}])
+	for frame in Combat.DIZZY_MIN_DURATION-1: s.step([{},{}])
+	check(defender.state=="dizzy" and defender.move=="","An early attack press cannot skip the minimum dizzy window")
+	s.step([{}, {"command":"hp"}])
+	s.step([{},{}])
+	check(defender.move=="hp" and defender.dizzy_timer==0,"A fresh attack tap after the dizzy window immediately queues a recovery strike")
 	s=setup();s.begin_dizzy(s.fighters[1]);s.fighters[1].health=20;hit(s);s.end_round()
 	check(s.fighters[1].state=="ko" and s.fighters[1].dizzy_timer==0 and not s.fighters[1].dizzy_pending,"A lethal punish ends in KO without lingering stars")
 	s.reset_round()
@@ -231,8 +274,14 @@ func run():
 			var facing=1 if kind%2==0 else -1
 			test_plasma(s,kind,facing,false)
 			test_plasma(s,kind,-facing,true)
-	var light_slide=guard_distance(s,"lp")
-	var heavy_slide=guard_distance(s,"hp")
-	check(light_slide>0 and heavy_slide>light_slide+10 and heavy_slide<60,"A guarded heavy punch slides a little farther than a guarded jab")
+	var light=measure_guard(s,"lp")
+	var heavy=measure_guard(s,"hp")
+	check(light.slide>44.0 and heavy.slide>light.slide+32.0 and heavy.slide<112.0,"A guarded heavy punch gives more ground than a guarded jab (%.1f / %.1f px)" % [light.slide,heavy.slide])
+	check(heavy.early_slide>52.0 and heavy.locked and heavy.stop>=8 and heavy.rigid and heavy.recovered,"Heavy guard stays rigid through blockstop and the backward skid")
+	check(heavy.get("spark_life",0)>=heavy.stop+7,"Heavy guard burst stays visible as the skid begins")
+	var low=measure_guard(s,"c_hk",-1,true)
+	check(low.early_slide>50.0 and low.locked and low.rigid and low.recovered,"Crouching guard stays rigid and skids in the mirrored direction")
+	var wall=measure_guard(s,"hp",1,false,true)
+	check(wall.slide==0.0 and wall.locked and wall.rigid and wall.recovered,"Wall guard holds its pose inside the stage boundary")
 	print("DIZZY / CLASH RESULT: ",checks-failures," passed; ",failures," failed")
 	quit(1 if failures else 0)

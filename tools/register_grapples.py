@@ -18,6 +18,7 @@ for name,kinds in groups:
   for col in range(6):
    x0,x1=round(col*image.width/6),round((col+1)*image.width/6)
    y0,y1=round(row*image.height/len(kinds)),round((row+1)*image.height/len(kinds))
+   if kind==8 and col in [0,1,5]: y1=260  # Stan's soles extend below the first row guide.
    mask=alpha[y0:y1,x0:x1]
    blobs=space['components'](mask);assert blobs,(name,row,col)
    left,top,right,bottom,area=blobs[0]

@@ -67,6 +67,16 @@ func run():
 	game.sim.time_left=98*60
 	await capture("lamar-match")
 	var f:Dictionary=game.sim.fighters[0]
+	var walk_textures={}
+	for phase in 6:
+		f.walk=1
+		f.walk_phase=phase*.5
+		await capture("lamar-walk-"+str(phase))
+		var frame:int=game.art.movement_art.frame_index(f,{})
+		if game.art.movement_art.cache.has(Vector2i(13,frame)):
+			walk_textures[game.art.movement_art.cache[Vector2i(13,frame)].texture]=true
+	check(walk_textures.size()==6,"Lamar draws six distinct walking textures")
+	f.walk=0
 	game.sim.start_move(f,"hp")
 	f.frame=lamar.moves.hp.startup+1
 	await capture("lamar-punch")
@@ -82,12 +92,13 @@ func run():
 		b.x=591
 		game.sim.step([{"command":"throw","back":back},{"back":true}])
 		var held=false
-		var tossed=false
+		var released=false
 		for frame in 100:
 			game.sim.step([{},{}])
 			held=held or b.grabbed_by==0
-			tossed=tossed or b.throw_flight
-		check(held and tossed and b.health==1000-int(lamar.moves.throw.damage),"Throw grabs/releases and damages once: back="+str(back))
+			for event in game.sim.events:
+				released=released or event.type=="grab_release"
+		check(held and released and b.health==1000-int(lamar.moves.throw.damage),"Throw grabs/releases and damages once: back="+str(back))
 	game.sim.new_match(13,8)
 	game.sim.phase="results"
 	game.sim.winner=0
@@ -99,6 +110,14 @@ func run():
 	game.sim.wins=[2,0]
 	await capture("lamar-loses")
 	check(game.results_portraits.frames.has(26) and game.results_portraits.frames.has(27),"Victory and defeat portraits both render")
+	var defeated:Image=game.results_portraits.frames[27].get_image()
+	var top_scan_is_clean=true
+	for y in 8:
+		var row_width=0
+		for x in defeated.get_width():
+			if defeated.get_pixel(x,y).a>.5: row_width+=1
+		top_scan_is_clean=top_scan_is_clean and row_width<defeated.get_width()/3.0
+	check(top_scan_is_clean,"Lamar's defeat portrait starts at his hair with no victory sprite bleed")
 	game.queue_free()
 	await process_frame
 	for path in ["res://.runtime/lamar-stage-test.cfg","res://.runtime/lamar-unlock-test.cfg"]:

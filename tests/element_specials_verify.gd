@@ -9,7 +9,7 @@ func _initialize(): call_deferred("run")
 func check(ok:bool,label:String):
 	checks+=1;print(("PASS " if ok else "FAIL ")+label)
 	if not ok: failures+=1
-func fight(kind:int,name:String,distance:float=125,guard:bool=false,facing:int=1,ko:bool=false)->Dictionary:
+func fight(kind:int,name:String,distance:float=125,guard:bool=false,facing:int=1,ko:bool=false,low:bool=false)->Dictionary:
 	var sim=Combat.new();sim.new_match(kind,0);sim.phase="fight"
 	var a=sim.fighters[0];var b=sim.fighters[1]
 	a.x=600-distance*.5*facing;b.x=600+distance*.5*facing;a.facing=facing;b.facing=-facing
@@ -19,7 +19,7 @@ func fight(kind:int,name:String,distance:float=125,guard:bool=false,facing:int=1
 	var hits=0;var blocks=0;var effect_seen=false;var wrong_effect=false;var stationary=true;var attack_done=false;var health_at_end=-1
 	var expected="electric" if kind==6 else "fire"
 	for tick in 210:
-		sim.step([{}, {"back":guard}])
+		sim.step([{}, {"back":guard,"down":low}])
 		if a.move==name: stationary=stationary and a.y==Combat.FLOOR and not a.crouch
 		if b.element_timer>0: effect_seen=true;wrong_effect=wrong_effect or b.element_hit!=expected
 		for event in sim.events:
@@ -68,9 +68,10 @@ func run():
 			check(result.stationary,"Cast stays grounded and upright: "+label)
 			check(result.sim.fighters[0].move=="" and result.sim.fighters[1].element_timer==0,"Recovery completes and effect expires: "+label)
 			check(result.health_at_end==result.sim.fighters[1].health,"No lingering damage over time: "+label)
-			var blocked=fight(kind,name,125,true,facing)
-			check(blocked.blocks>0 and blocked.hits==0 and not blocked.effect,"Standing guard blocks without burning/shocking defender: "+label)
-			check(blocked.sim.fighters[1].health>=979,"Guard chip stays bounded: "+label)
+			for low in [false,true]:
+				var guarded=fight(kind,name,125,true,facing,false,low)
+				var stance="Crouching" if low else "Standing"
+				check(guarded.hits>0 and guarded.blocks==0 and guarded.effect and not guarded.wrong,stance+" guard takes the elemental hit: "+label)
 		var miss=fight(kind,name,420)
 		check(miss.hits==0 and not miss.effect and miss.sim.projectiles.is_empty(),"Close-range special does not become a projectile: "+label)
 		var ko=fight(kind,name,125,false,1,true)
@@ -81,14 +82,13 @@ func run():
 		f.frame=move.startup+move.active;check(base.attackboxes(f,move).is_empty(),"No recovery hitbox: "+label)
 		f.y=Combat.FLOOR-80;check(base.legal_command(f,name)=="","Ground-only cast cannot begin in air: "+label)
 	var f=base.make_fighter(6,0);base.start_move(f,"special3");var move=base.move_data(f)
-	f.frame=move.startup;check(FX.palette(f,move)=="white","Spike flashes white on active electricity frame")
+	f.frame=move.startup;check(FX.palette(f,move)=="cyan","Spike flashes cyan around the white lightning core")
 	f.frame=move.startup+4;check(FX.palette(f,move)=="","Normal costume returns between electrical flashes")
-	f.frame=move.startup+move.active;check(FX.palette(f,move)=="","White strobe stops at recovery")
+	f.frame=move.startup+move.active;check(FX.palette(f,move)=="","The colored strobe stops at recovery")
 	f.element_hit="electric";f.element_timer=12;base.fighters[0]=f;base.phase="fight";base.freeze=2
 	base.step([{},{}]);check(f.element_timer==12,"Element timing pauses during hitstop")
 	base.reset_round();check(base.fighters[0].element_timer==0,"Round reset clears elemental reactions")
 	check(SFX.attack_cue({"move":"special3","fighter":6,"element":"electric"})=="electric","Shock routes to electrical sound")
 	check(SFX.attack_cue({"move":"special1","fighter":4,"element":"fire"})=="flame","Flame cast routes to flame sound")
-	check(SFX.impact_cue({"type":"block","element":"fire"})=="block","Blocked flame retains block audio")
 	print("ELEMENT SPECIALS RESULT: ",checks-failures," passed; ",failures," failed")
 	quit(1 if failures else 0)

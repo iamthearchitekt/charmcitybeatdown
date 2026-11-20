@@ -30,7 +30,53 @@ func attack(s,name:String,defense:Dictionary={},count:int=55):
 	s.step([{"command":name},defense])
 	frames(s,count,{},defense)
 
+func test_oriole_resistance():
+	for kind in [1,12]:
+		var s=setup(0,kind)
+		var defender=s.fighters[1]
+		var move=s.data.fighters[0].moves.hp.duplicate(true)
+		move.chip=20
+		var scale=.85 if kind==12 else 1.0
+		s.apply_contact({"a":0,"b":1,"move":"hp","m":move,"block":false,"dir":1,"projectile":false})
+		var strike=Combat.MAX_HEALTH-defender.health
+		s.apply_contact({"a":0,"b":1,"move":"hp","m":move,"block":true,"dir":1,"projectile":false})
+		var chip=Combat.MAX_HEALTH-defender.health-strike
+		s.grapple_damage(s.fighters[0],defender,100,true)
+		var grab=Combat.MAX_HEALTH-defender.health-strike-chip
+		check(strike==roundi(int(move.damage)*scale) and chip==roundi(20*scale) and grab==roundi(100*scale),"Damage resistance on strikes, chip and grabs is reserved for Oriole Bird: "+str(kind))
+
+func test_cpu_spacing():
+	var s=Combat.new()
+	var timely=true
+	var sensible_range=true
+	for kind in s.data.fighters.size():
+		s.new_match((kind+4)%14,kind)
+		s.phase="fight"
+		s.fighters[0].x=430
+		s.fighters[1].x=835
+		var cpu=CPU.new()
+		for frame in 105:
+			var distance=absf(s.fighters[0].x-s.fighters[1].x)
+			var input=cpu.control(s,1,1)
+			if input.command!="" and distance>350:
+				sensible_range=sensible_range and s.data.fighters[kind].moves[input.command].get("projectile",false)
+			s.step([{},input])
+			if s.fighters[0].health<1000: break
+		timely=timely and s.fighters[0].health<1000
+	check(timely and sensible_range,"Every Normal CPU initiates offense from range without throwing distant melee attacks")
+	s.new_match(0,11);s.phase="fight"
+	s.fighters[0].x=385;s.fighters[1].x=850
+	var poe=CPU.new()
+	var shots:Array=[]
+	for frame in 230:
+		s.step([{},poe.control(s,1,1)])
+		if s.events.any(func(event):return event.type=="projectile_spawn"): shots.append(s.tick)
+	var patient=not shots.is_empty()
+	for i in range(1,shots.size()): patient=patient and shots[i]-shots[i-1]>=85
+	check(patient,"Poe uses ranged pressure and leaves a gap between shots")
+
 func run():
+	test_oriole_resistance()
 	var s=setup()
 	check(s.data.fighters.size()==14,"Fourteen fighter appearances with editable move sets")
 	for fd in s.data.fighters:
@@ -105,6 +151,29 @@ func run():
 	s.step([{"dx":1,"up":true},{}])
 	frames(s,43,{"dx":1})
 	check(s.fighters[0].x>s.fighters[1].x and s.fighters[0].facing==-1 and s.fighters[1].facing==1,"Jump-over side switch updates facing")
+	s=setup();s.fighters[0].x=350;s.fighters[1].x=930
+	var jump_counts=[0,0]
+	var jump_waits_for_landing=true
+	for frame in 145:
+		var was_grounded=s.fighters.map(func(f): return f.y==Combat.FLOOR)
+		s.step([{"up":true},{"up":true}])
+		for event in s.events:
+			if event.type=="jump":
+				jump_counts[event.owner]+=1
+				jump_waits_for_landing=jump_waits_for_landing and was_grounded[event.owner]
+	check(jump_counts[0]>=3 and jump_counts[1]>=3 and jump_waits_for_landing,"Holding either player's Up repeats jumps only after landing")
+	frames(s,60)
+	check(s.fighters.all(func(f): return f.y==Combat.FLOOR),"Releasing Up lets both fighters land and stay grounded")
+	for direction in [-1,1]:
+		var clears=true
+		for kind in s.data.fighters.size():
+			var crossover=setup(kind,(kind+1)%s.data.fighters.size())
+			crossover.fighters[0].x=640-65*direction
+			crossover.fighters[1].x=640+65*direction
+			crossover.step([{"dx":direction,"up":true},{}])
+			frames(crossover,48,{"dx":direction})
+			clears=clears and (crossover.fighters[0].x-crossover.fighters[1].x)*direction>0.0
+		check(clears,"All fighters can cross a standing opponent with an ordinary forward jump: "+str(direction))
 	s=setup()
 	s.fighters[1].x=850.0
 	attack(s,"special1",{},90)
@@ -196,6 +265,7 @@ func run():
 		s.step([{},control])
 		cpu_dealt_damage=cpu_dealt_damage or s.fighters[0].health<started_health
 	check(legal and cpu_dealt_damage,"CPU selects legal moves and successfully fights across round resets")
+	test_cpu_spacing()
 	cpu=CPU.new();s=setup();s.training=true
 	s.fighters[0].x=400;s.fighters[1].x=570
 	var retreats=0
@@ -204,7 +274,7 @@ func run():
 		var control=cpu.control(s,1,1)
 		var distance=absf(s.fighters[1].x-s.fighters[0].x)
 		if control.dx==-s.fighters[1].facing: retreats+=1
-		if distance<155 and control.dx==s.fighters[1].facing: crowded_forward+=1
+		if distance<=Combat.PUSH_WIDTH+7.0 and control.dx==s.fighters[1].facing: crowded_forward+=1
 		s.step([{"dx":-1,"back":true},control])
 	check(retreats>10 and crowded_forward==0,"Normal CPU backs off and never walks into close pushbox pressure")
 	s=setup()
@@ -228,16 +298,34 @@ func run():
 	s.fighters[1].x=612
 	s.start_move(s.fighters[0],"hp")
 	var missed=s.move_data(s.fighters[0])
-	s.fighters[0].frame=missed.startup+missed.active+1
 	cpu=CPU.new()
 	var counters=0
+	var short_heavies=0
+	var long_heavies=0
 	for seed_value in 30:
+		s.fighters[0].frame=missed.startup+missed.active+missed.recovery-6
 		cpu=CPU.new();cpu.rng.seed=seed_value
-		if cpu.control(s,1,1).command=="lp": counters+=1
-	check(counters>0 and counters<30,"CPU sometimes punishes a nearby missed heavy with a fast jab")
+		var late:String=cpu.control(s,1,1).command
+		if late=="lp": counters+=1
+		if late in ["hp","hk"]: short_heavies+=1
+		s.fighters[0].frame=missed.startup+missed.active+1
+		cpu=CPU.new();cpu.rng.seed=seed_value
+		if cpu.control(s,1,1).command in ["hp","hk"]: long_heavies+=1
+	check(counters>0 and counters<30,"CPU sometimes punishes a short recovery window with a fast jab")
+	check(long_heavies>short_heavies and long_heavies<30,"CPU favors heavy strikes if a close-range opening lasts long enough")
 	cpu=CPU.new()
 	cpu.cooldown=8
 	check(cpu.control(s,1,1).command=="","Whiff punishment still respects the CPU cooldown")
+	var blocks=0
+	for seed_value in 30:
+		s=setup(0,0)
+		s.fighters[1].x=612
+		s.start_move(s.fighters[0],"hp")
+		s.fighters[0].frame=s.move_data(s.fighters[0]).startup-1
+		cpu=CPU.new();cpu.rng.seed=seed_value;cpu.cooldown=18
+		s.step([{},cpu.control(s,1,1)])
+		if s.events.any(func(event): return event.type=="block"): blocks+=1
+	check(blocks>=12 and blocks<30,"CPU reads and blocks some real heavy punches without perfect defense")
 	# Full scene smoke and real Godot input-event path (headless, no hardware required).
 	var main=load("res://main.tscn").instantiate()
 	root.add_child(main)

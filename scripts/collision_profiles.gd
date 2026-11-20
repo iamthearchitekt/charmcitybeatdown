@@ -24,7 +24,7 @@ func local_parts(f:Dictionary,m:Dictionary,attack:bool)->Array:
 func world_parts(f:Dictionary,m:Dictionary,scale:float,attack:bool=false)->Array:
 	var parts:Array=[]
 	var origin=Vector2(f.x+(-4*f.facing if f.state=="hit" else 0),f.y)
-	var transform=Transform2D(0,Vector2(f.facing*scale,scale),0,origin)
+	var transform=Transform2D(Vector2(f.facing*scale,0),Vector2(-Pose.impact_shear(f)*scale,scale),origin)
 	var tossed=(f.get("throw_flight",false) or f.get("grabbed_by",-1)>=0) and f.get("grapple_role","")==""
 	var offset=Vector2.ZERO
 	if tossed:

@@ -1,5 +1,15 @@
 extends RefCounted
 ## Data-only pose selection shared by drawing and collision. Gameplay ticks stop in hitstop.
+const MARCUS_ATTACKER_GRAPPLES={0:"throw:0",1:"throw:1",2:"throw:2",5:"throw:1"}
+const LAMAR_WALK_FRAMES=[0,1,4,5,6,7]
+
+static func grapple_key(kind:int,frame:int)->String:
+	var key="grapple:"+str(frame)
+	return MARCUS_ATTACKER_GRAPPLES.get(frame,key) if kind==0 else key
+
+static func impact_shear(f:Dictionary)->float:
+	return float(f.get("impact_recoil",0.0)) if f.state=="hit" else 0.0
+
 static func base(f:Dictionary,m:Dictionary,t:float)->int:
 	if f.state=="ko": return 13 if f.y<622.0 or f.vy<0 else 15
 	if f.state=="knockdown": return 13
@@ -34,7 +44,9 @@ static func movement(f:Dictionary,m:Dictionary)->int:
 		if f.frame>=m.startup+m.active+int(m.recovery*.60): return -1
 		return 2 if f.frame<m.startup else 3
 	if f.move=="" and f.state=="idle" and f.y>=621 and f.dash==0 and f.get("backstep_pose",-1)<0 and absf(f.walk)>0:
-		return int(f.get("walk_phase",0.0))%2
+		var phase=float(f.get("walk_phase",0.0))
+		if f.kind==13: return LAMAR_WALK_FRAMES[int(phase*2.0)%LAMAR_WALK_FRAMES.size()]
+		return int(phase)%2
 	return -1
 
 static func signature(f:Dictionary,m:Dictionary)->int:
@@ -63,8 +75,8 @@ static func key(f:Dictionary,m:Dictionary)->String:
 	if f.state=="ko" and f.y>=622.0 and f.vy>=0: return "base:15"
 	if f.get("grapple_role","")!="":
 		if f.get("grapple_pose",-1)==-2: return "base:13"
-		if f.get("grapple_pose",-1)>=0: return "grapple:"+str(f.grapple_pose)
-	if m.get("grapple",false): return "grapple:0"
+		if f.get("grapple_pose",-1)>=0: return grapple_key(f.kind,f.grapple_pose)
+	if m.get("grapple",false): return grapple_key(f.kind,0)
 	if f.get("grabbed_by",-1)>=0 or f.get("throw_flight",false): return "throw:3"
 	if m.has("pose_sequence"):
 		var sequence:Dictionary=m.pose_sequence

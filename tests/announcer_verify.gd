@@ -24,6 +24,12 @@ func run():
 			main.sim.step([{},{}])
 			for event in main.sim.events: main.dispatch_combat_event(event)
 		check(main.announcer.playback_log==["round",str(number),"fight"],"Fight follows the complete Round "+str(number)+" announcement")
+	main.sim.new_match(0,1);main.sim.round_number=3;main.sim.wins=[1,1]
+	main.announcer.clear();main.announcer.playback_log.clear()
+	for frame in 40:
+		main.sim.step([{},{}])
+		for event in main.sim.events: main.dispatch_combat_event(event)
+	check(main.sim.is_final_round() and main.announcer.playback_log==["final"] and main.announcer.pending==["round"],"A tied deciding round calls FINAL ROUND")
 	main.dispatch_combat_event({"type":"fight"})
 	check(main.announcer.playing and main.announcer.playback_log[-1]=="fight","Fight voice plays on round start")
 	main.toggle_pause();check(main.announcer.stream_paused,"Announcer pauses with match")
@@ -36,6 +42,7 @@ func run():
 			await create_timer(1.3).timeout
 			var result="lose" if mode==0 and winner==1 else "win"
 			check(main.announcer.playback_log==["you",result],"Correct sequenced result voice: mode "+str(mode)+" winner "+str(winner))
+			check(main.result_callout_age==0 and main.player_lost_match()==(result=="lose"),"The painted outcome starts with the matching result cue")
 			main.sync_match_end_audio();check(main.announcer.playback_log.size()==2,"Result voice does not repeat")
 	main.queue_redraw();await process_frame;await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png("res://tests/visual/centered-results.png")

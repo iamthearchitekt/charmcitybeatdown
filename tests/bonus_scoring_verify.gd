@@ -30,7 +30,7 @@ func run():
 	check(game.arcade.score==total,"Repeated bookkeeping never credits the same points twice")
 	# Finish the remaining real-time incoming kegs through ordinary controls.
 	game.bonus_accounted=false
-	for frame in 1800:
+	for frame in game.sim.time_left:
 		if game.sim.phase=="results": break
 		var f=game.sim.fighters[0];var target={};var nearest=INF
 		for o in game.sim.objects:

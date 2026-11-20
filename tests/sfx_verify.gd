@@ -58,6 +58,11 @@ func run():
 	check(count_cue("projectile")==1 and count_cue("special_hit")==1,"Projectile launch and delayed contact have distinct cues")
 	check(count_cue("projectile_voice")==1,"Hadouken voice plays once on actual plasma-ball spawn")
 	sim=setup(420)
+	sim.new_match(7,0);sim.phase="fight"
+	step(sim,{"command":"special1"})
+	for i in 30: step(sim)
+	check(count_cue("sonic_boom")==1 and count_cue("projectile_voice")==0 and bank.playback_log.any(func(item):return item.file=="46_guile_sonicboom.wav"),"Eric's projectile plays the supplied Sonic Boom on launch")
+	sim=setup(420)
 	sim.new_match(6,0);sim.phase="fight"
 	sim.fighters[0].x=400;sim.fighters[1].x=820
 	step(sim,{"command":"special3"})

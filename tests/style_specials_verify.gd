@@ -66,10 +66,21 @@ func run():
 			check(read_input(3,[2,8],kick,facing,40)=="special4","Lauren's arc reads down charge then up")
 	check(read_input(7,[2,3,6],"hp",1)=="hp" and read_input(7,[4,6],"hp",1,20)=="hp","Eric's blade needs an actual back charge")
 	var reader=Commands.new()
+	var stan_kit=sim.data.fighters[8].moves
 	var input_result=""
-	for i in 19:
-		input_result=reader.sample(5,["mp"] if i in [0,9,18] else [],sim.data.fighters[8].moves)
-	check(input_result=="special3","Three separate punch presses activate Stan's palms")
+	for i in 13:
+		input_result=reader.sample(5,["mp"] if i in [0,6,12] else [],stan_kit)
+	check(input_result!="special3","Three presses cannot start Redline Palms")
+	check(reader.sample(5,["mp"],stan_kit)=="special3","The fourth fresh punch starts Redline Palms")
+	for i in 8: reader.sample(5,["mp"],stan_kit,true)
+	check(reader.sample(5,["mp"],stan_kit)!="special3","Punches during Redline Palms do not count toward the next barrage")
+	sim.new_match(8,0)
+	sim.phase="fight"
+	sim.step([{"command":"special3"},{}])
+	for i in 95:
+		var mash="special3" if sim.fighters[0].move=="special3" else ""
+		sim.step([{"command":mash},{}])
+	check(sim.fighters[0].move=="" and sim.fighters[0].queued=="","The combat buffer cannot queue a repeat barrage during recovery")
 	for entry in [[8,"special3",160],[7,"special1",350],[10,"special1",350],[10,"special5",350],
 		[10,"special2",153],[10,"special3",313],[0,"special5",228],[0,"special6",209],
 		[0,"special3",160],[1,"special3",154],[3,"special3",160],[3,"special4",140]]:

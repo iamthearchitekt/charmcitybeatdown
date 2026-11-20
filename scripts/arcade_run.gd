@@ -1,5 +1,6 @@
 extends RefCounted
 ## One finite run: shuffled roster, two fixed bosses, cumulative score and top ten.
+const Stage=preload("res://scripts/harbor_stage.gd")
 var active=false
 var player=0
 var opponents:Array=[]
@@ -15,20 +16,24 @@ const BONUS_TYPES=["car","kegs","boxes"]
 
 func _init(): load_scores()
 
-func begin(kind:int,roster:Array,eligible:Array):
+func begin(kind:int,roster:Array):
 	active=true;player=kind;cursor=0;score=0;continues=0;bonus_index=0;submitted=false
 	opponents=[]
-	var final_boss=pick_boss(["rachel","jeff","stan"],kind,roster,eligible,[])
-	var sub_boss=pick_boss(["spike","stan","marcus"],kind,roster,eligible,[final_boss])
-	for opponent in eligible:
+	var final_boss=pick_boss(["rachel","jeff","stan"],kind,roster,[])
+	var sub_boss=pick_boss(["spike","stan","marcus"],kind,roster,[final_boss])
+	for opponent in roster.size():
 		if opponent!=kind and opponent not in [sub_boss,final_boss]: opponents.append(opponent)
 	opponents.shuffle()
+	for index in opponents.size():
+		if Stage.home_stage(roster[opponents[index]].id)==Stage.INNER_HARBOR:
+			opponents.push_front(opponents.pop_at(index))
+			break
 	if sub_boss>=0: opponents.append(sub_boss)
 	if final_boss>=0: opponents.append(final_boss)
 
-func pick_boss(ids:Array,kind:int,roster:Array,eligible:Array,excluded:Array)->int:
+func pick_boss(ids:Array,kind:int,roster:Array,excluded:Array)->int:
 	for id in ids:
-		for i in eligible:
+		for i in roster.size():
 			if i!=kind and i not in excluded and roster[i].id==id: return i
 	return -1
 
@@ -37,8 +42,10 @@ func complete()->bool: return active and cursor>=opponents.size()
 func won_match(points:int):
 	if not active or complete(): return
 	score+=maxi(0,points);cursor+=1
+func has_bonus()->bool: return bonus_index<BONUS_TYPES.size()
 func next_bonus()->String:
-	var kind=BONUS_TYPES[bonus_index%BONUS_TYPES.size()]
+	if not has_bonus(): return ""
+	var kind=BONUS_TYPES[bonus_index]
 	bonus_index+=1
 	return kind
 func load_scores():

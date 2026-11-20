@@ -11,6 +11,10 @@
     "FELLS POINT / CAR CRUSH": "res://audio/loops/alien-power.ogg",
     "WESTMINSTER / POE'S GRAVE": "res://audio/loops/revenge-of-mr-x.ogg",
     "BREWERS HILL": "res://audio/loops/back-to-the-industry.ogg",
+    "FELLS POINT": "res://audio/loops/alien-power.ogg",
+    "M&T BANK STADIUM / TAILGATE": "res://audio/loops/go-straight.ogg",
+    "PIMLICO / INFIELD": "res://audio/loops/go-straight.ogg",
+    "WAREHOUSE": "res://audio/loops/back-to-the-industry.ogg",
     "BREWERS HILL / KEG BREAK": "res://audio/loops/alien-power.ogg",
     "DUNDALK / BOX BREAK": "res://audio/loops/back-to-the-industry.ogg"
   }

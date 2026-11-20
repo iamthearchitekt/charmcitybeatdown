@@ -10,11 +10,25 @@ HUD correction: scores, names and round markers now draw directly over the stage
 
 Latest presentation update: the fighting HUD groups scores above the health bars and names/round wins beneath them; bottom control instructions are removed. The pause screen still contains the full controls. Locked secret characters show only question marks on select, including preview names/art; the map uses WESTMINSTER. The level name appears only during the first-round introduction, with round numbers on subsequent intros.
 
-All fourteen fighters now have two dedicated stride/passing walking frames paced by distance traveled, replacing the old reused-idle walk sequence. All nine projectile users also have gathered-hands startup and two-handed Hadouken-style release poses. Their costumes, likenesses, heights and shared fine pixel/dither rendering are preserved. Sources are `assets/movement-a..d.png`, `data/movement-atlases.json`, `scripts/movement_art.gd` and `tools/register_movement.py`. The projectile origin moves forward to match the extended palms while retaining the common flight height. Poe's four-frame projectile uses a UV-violet palette; Spike keeps fire and other casters keep blue.
+All fourteen fighters have two dedicated stride/passing walking frames paced by distance traveled. The nine projectile users have gathered-hands startup and two-handed release poses. Sources are `assets/movement-a..d.png`, `data/movement-atlases.json`, `scripts/movement_art.gd` and `tools/register_movement.py`. Painted projectile, attack trail and contact sprites use fighter-specific palettes. Poe and Lamar share the violet projectile, and Spike retains his fire animation. Rebuild the shared action atlas with `tools/bake_action_fx.py`.
+
+Stan's Redline Palms needs four fresh punch taps and recovers for 30 frames. Guarded hits hold the impact freeze, then slide the defender farther away during blockstun.
 
 Westminster / Poe's Grave is now **dark stormy daytime**, with gray overcast daylight, no moon, subtle two-state cloud lighting, the existing rain effect and intermittent crows. Keg/car/box points now credit the cumulative Arcade total live, show their subtotal and final payout, and survive returning to the ladder. Standalone bonus testing initializes a run before awarding points. Bonus completion and bookkeeping are idempotent. New checks cover all46 poses and real hit/clear/failure/next-fight score carryover.
 
-A Windows/Godot 4.3 arcade fighter with fourteen characters, seven fighting stages and three rotating bonus challenges. Launch `Play.cmd` or the existing desktop shortcut. Keep `build/CharmCityBeatdown.exe` and its adjacent `.pck` together. Import `project.godot` in Godot 4.3 to work on the editable source.
+A Windows/Godot 4.3 arcade fighter with fourteen characters, eleven fighting stages and three rotating bonus challenges. Launch `Play.cmd` or the existing desktop shortcut. Keep `build/CharmCityBeatdown.exe` and its adjacent `.pck` together. Import `project.godot` in Godot 4.3 to work on the editable source.
+
+The desktop shortcut targets `build/CharmCityBeatdown.exe` in this checkout. Publish every verified Windows build to that location using the Windows Desktop export preset so the same shortcut launches the latest version. Close the game before replacing its resource pack.
+
+## Versus
+
+In **Local Versus**, lock in both fighters, pick a stage from the thumbnail grid, and start the match. For **Online Versus**, install the same build on both PCs. One player selects **Create Room** and shares the code. Their friend pastes it into **Room Code** and selects **Join Room**. Both players use their usual first-player keyboard or controller layout.
+
+Both online players lock in their own fighter before the stage grid opens. The host chooses the stage and starts the match. Online rematches require both players to agree and keep the selected fighters and stage.
+
+Room codes use the [online relay](relay/README.md). Configure its public WebSocket origin before exporting a build with room-code support.
+
+Eric and Stan’s Arcade fights take place at a sunny Pimlico infield with three two-frame flags. Alex’s home stage is an empty warehouse with metal shelving, a parked forklift with an amber beacon, and two foreground boxes that fighters can break independently.
 
 ## Arcade campaign and combat update
 
@@ -44,7 +58,7 @@ The car stage now gives **30 seconds** and omits attack instructions, jump hints
 
 The title screen displays the stage painting without the former 49% dark overlay. Title/menu music is -11 dB, a restrained 2 dB increase; stage music remains -13 dB.
 
-Inner Harbor opens the first fight in each application session. Later fights randomize without immediate repeats; round transitions and returning to the menu do not reset the opener. A small two-pose rat runs along the Inner Harbor foreground, pauses twice and resumes, then returns from the opposite edge. It uses the paused stage clock and is absent from other stages and the title screen. Rat sources/registration: `assets/harbor-rat-source.png`, `tools/register_harbor_rat.py`, `scripts/harbor_rat.gd`.
+Inner Harbor opens the first fight in each application session. Later fights randomize without immediate repeats; round transitions and returning to the menu do not reset the opener. Rats scuttle behind the fighters on Inner Harbor and Dundalk. Each rat has its own entry timing, pace and two pauses before returning from the opposite edge. Their animation uses the paused stage clock. Rat sources and registration are in `assets/harbor-rat-source.png`, `tools/register_harbor_rat.py` and `scripts/harbor_rat.gd`. Breakable street trash cans use four painted damage states from `assets/stage-trash-can-source.png`, registered by `tools/bake_stage_props.py`.
 
 Stan's presentation scale is now 1.1235, exactly 5% above his former 1.07; Jeff remains tallest. Selection movement now uses the short `5B_zap_1.wav` at -22 dB, with a distinct `5E_zap_3.wav` confirm at -18 dB. Round intros sequence the supplied ROUND and number clips before FIGHT; rounds 1-9 are supported, with FINAL ROUND after that. The 150-frame intro leaves 110 frames for the call. A separate Hadouken voice fires once when an actual plasma projectile spawns, alongside the energy effect.
 
@@ -119,7 +133,7 @@ The primary Retro-Bit Sega layout also applies when Windows calls the pad a gene
 
 Genesis C is handled through Godot's normalized right-trigger axis. Holding an attack does not repeat it; release and press again. Controller setup (F4) supports buttons and axes, saves per controller identity, rejects duplicate gameplay bindings and preserves keyboard bindings. Canceling setup preserves the previous profile. Pair the controller in Windows before launching. Controller verification uses synthetic events; physical Bluetooth operation remains a hands-on check.
 
-The pause menu presents a **SEGA MOVE LIST** with physical button labels and plain D-pad instructions. Forward means toward the opponent. For the first special, roll DOWN through DOWN-FORWARD to FORWARD, then press A or B. For the uppercut/rising special, press FORWARD, DOWN, DOWN-FORWARD and A or B. Hold BACK to guard; DOWN + BACK guards lows. Throws beat guard. Press Y close to grab, lift over the shoulder and toss. Hold BACK + Y for a back throw. Throws cannot grab airborne fighters, protected wake-ups or opponents out of range. UP jumps; X or C while airborne kicks. Double-tap forward/back to dash/backdash. Holding back takes one short step, then blocks in place until released.
+The pause menu presents a **SEGA MOVE LIST** with physical button labels and plain D-pad instructions. Forward means toward the opponent. For the first special, roll DOWN through DOWN-FORWARD to FORWARD, then press A or B. For the uppercut/rising special, press FORWARD, DOWN, DOWN-FORWARD and A or B. Hold BACK to guard; DOWN + BACK guards lows. Throws beat guard and keep the opponent in front even when holding BACK. Ground throws cannot grab airborne fighters, protected wake-ups or opponents out of range. UP jumps; X or C while airborne kicks. Double-tap forward/back to dash/backdash. Holding back takes one short step, then blocks in place until released.
 
 N toggles music, M mutes all audio, F11 toggles fullscreen, and F also toggles fullscreen on the title screen. Keyboard F remains P2's light punch during fights. The seventh main-menu entry, **QUIT GAME**, exits via mouse, keyboard or controller.
 

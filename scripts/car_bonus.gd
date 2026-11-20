@@ -1,9 +1,9 @@
 extends "res://scripts/combat.gd"
 const Car=preload("res://scripts/bonus_car.gd")
-const DURATION=30*60
-const BONUS_JUMP_SPEED=20.4
-const BONUS_JUMP_GRAVITY=.79
-const AIR_SPEED=10.2
+const DURATION=25*60
+const BONUS_JUMP_SPEED=20.4*Car.ART_SCALE
+const BONUS_JUMP_GRAVITY=.79*Car.ART_SCALE
+const AIR_SPEED=10.2*Car.ART_SCALE
 var car=Car.new()
 var score=0
 var success=false
@@ -79,7 +79,8 @@ func resolve_car_obstacle(f:Dictionary,previous_x:float):
 	# Jumping feet must clear the roof. No walking through or landing inside the car.
 	# The narrow windshield/roof is higher than the outer fenders, allowing a
 	# natural arc instead of requiring an exaggerated leap over a tall rectangle.
-	var roof=FLOOR-(222.0 if f.x>498 and f.x<782 else 141.0)
+	var near_roof=absf(f.x-Car.BODY.get_center().x)<Car.ROOF_HALF_WIDTH
+	var roof=FLOOR-(Car.ROOF_HEIGHT if near_roof else Car.FENDER_HEIGHT)
 	if f.y<=roof: return
 	var left=Car.BODY.position.x-34.0
 	var right=Car.BODY.end.x+34.0

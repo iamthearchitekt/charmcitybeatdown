@@ -54,7 +54,12 @@ func run():
 	game.start_continue();await snap("continue")
 	game.screen="scores";game.arcade.high_scores=[{"name":"ALEX","score":123456,"clear":true,"continues":0},{"name":"LAMAR JACKSON","score":98765,"clear":false,"continues":2}]
 	await snap("scores")
-	game.screen="campaign";await snap("campaign")
+	game.arcade.cursor=game.arcade.opponents.size()
+	game.arcade.score=612570
+	game.begin_finale()
+	game.finale_age=17;await snap("campaign-impact")
+	game.finale_age=72;await snap("campaign")
+	check(captures["campaign-impact"].get_data()!=captures["campaign"].get_data(),"The Arcade finale animates from the stamp impact to the final score")
 	game.screen="challenger";await snap("challenger")
 	game.arcade.active=false;game.queue_free();await process_frame
 	for path in ["res://.runtime/arcade-visual-stage.cfg"]: DirAccess.remove_absolute(path)

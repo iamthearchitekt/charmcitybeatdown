@@ -1,0 +1,13 @@
+name = "charm-city-beatdown-relay"
+main = "worker.mjs"
+compatibility_date = "2026-11-01"
+workers_dev = true
+preview_urls = false
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "VersusRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["VersusRoom"]

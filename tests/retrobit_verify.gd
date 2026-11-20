@@ -38,24 +38,30 @@ func run():
 	game.pads.connect_device(71,"generic-xinput-primary")
 	game.pads.connect_device(72,"Xbox second pad")
 	game.selected_mode=1;game.begin_match();game.sim.phase="fight"
-	for pair in [[JOY_BUTTON_X,"lp"],[JOY_BUTTON_Y,"mp"],[JOY_BUTTON_A,"lk"],[JOY_BUTTON_B,"mk"]]:
+	for pair in [[JOY_BUTTON_A,"lp"],[JOY_BUTTON_B,"mp"],[JOY_BUTTON_X,"lk"],[JOY_BUTTON_Y,"mk"]]:
 		game.clear_controls();tap(pair[0])
 		check(game.read_control(0).command==pair[1],"Primary Retro-Bit face button routes "+pair[1])
 	game.clear_controls();axis(JOY_AXIS_TRIGGER_RIGHT,1)
-	check(game.read_control(0).command=="hk","Physical Sega C (right trigger) routes high kick")
+	check(game.read_control(0).command=="hp","Physical Sega C (right trigger) routes heavy punch")
 	axis(JOY_AXIS_TRIGGER_RIGHT,1)
 	check(game.read_control(0).command=="","Holding Sega C does not repeat the attack")
 	axis(JOY_AXIS_TRIGGER_RIGHT,0);axis(JOY_AXIS_TRIGGER_RIGHT,1)
-	check(game.read_control(0).command=="hk","Releasing and pressing Sega C permits another high kick")
+	check(game.read_control(0).command=="hp","Releasing and pressing Sega C permits another heavy punch")
 	axis(JOY_AXIS_TRIGGER_RIGHT,0)
 	game.clear_controls();axis(JOY_AXIS_TRIGGER_LEFT,1)
-	check(game.read_control(0).command=="hp","Physical Sega Z (left trigger) routes heavy punch")
+	check(game.read_control(0).command=="hk","Physical Sega Z (left trigger) routes heavy kick")
 	axis(JOY_AXIS_TRIGGER_LEFT,0)
 	for bumper in [JOY_BUTTON_LEFT_SHOULDER,JOY_BUTTON_RIGHT_SHOULDER]:
 		game.clear_controls();tap(bumper)
 		check(game.read_control(0).command=="throw","Each shoulder triggers grapple: "+str(bumper))
 	game.pads.profiles["generic-xinput-primary"]={"left":{"axis":JOY_AXIS_LEFT_X,"sign":-1},"lp":{"button":JOY_BUTTON_LEFT_SHOULDER}}
-	check(game.pads.mapping(71).left.has("axis") and game.pads.mapping(71).mp.button==JOY_BUTTON_Y and game.pads.mapping(71).throw.button==JOY_BUTTON_LEFT_SHOULDER,"Legacy profiles retain direction calibration and acquire the six-button layout")
+	check(game.pads.mapping(71).left.has("axis") and game.pads.mapping(71).mp.button==JOY_BUTTON_B and game.pads.mapping(71).throw.button==JOY_BUTTON_LEFT_SHOULDER,"Legacy profiles retain direction calibration and acquire the six-button layout")
+	var legacy=game.pads.defaults()
+	legacy.hp={"axis":JOY_AXIS_TRIGGER_LEFT,"sign":1}
+	legacy.throw_right={"button":JOY_BUTTON_RIGHT_SHOULDER}
+	game.pads.profiles["generic-xinput-primary"]=legacy
+	var migrated=game.pads.mapping(71)
+	check(migrated.lp.button==JOY_BUTTON_A and migrated.lk.button==JOY_BUTTON_X and migrated.hp==legacy.hk and migrated.hk==legacy.hp and migrated.confirm==legacy.confirm and legacy.lp.button==JOY_BUTTON_X,"Complete Sega saves swap only attack rows before use")
 	game.pads.profiles.clear()
 	game.clear_controls();tap(JOY_BUTTON_START)
 	check(game.paused,"Start still pauses")
@@ -63,12 +69,13 @@ func run():
 	game.clear_controls()
 	axis(JOY_AXIS_LEFT_Y,1);game.read_control(0)
 	axis(JOY_AXIS_LEFT_X,1);game.read_control(0)
-	axis(JOY_AXIS_LEFT_Y,0);tap(JOY_BUTTON_Y)
+	axis(JOY_AXIS_LEFT_Y,0);tap(JOY_BUTTON_B)
 	check(game.read_control(0).command=="special1","Medium punch can trigger a quarter-circle special")
 	axis(JOY_AXIS_LEFT_X,0)
 	game.clear_controls();tap(JOY_BUTTON_X,72)
 	check(game.read_control(1).command=="lp","Second standard pad retains its Xbox layout")
 	game.pads.profiles["generic-xinput-primary"]=game.pads.defaults()
+	game.pads.profiles["generic-xinput-primary"].attack_layout=Bindings.ATTACK_LAYOUT_VERSION
 	game.clear_controls();tap(JOY_BUTTON_X)
 	check(game.read_control(0).command=="lp","Explicit saved custom mappings take precedence")
 	game.action("title");game.pads.profiles={}
@@ -100,6 +107,10 @@ func run():
 	check(not game.music_enabled,"Controller can toggle music")
 	tap(JOY_BUTTON_A);tap(JOY_BUTTON_B)
 	game.selected_mode=2;game.begin_match();game.sim.phase="fight";tap(JOY_BUTTON_START)
+	navigate(JOY_BUTTON_DPAD_UP);tap(JOY_BUTTON_A)
+	check(game.pause_moves_open and game.pause_move_slots()==[0],"Training Moves List shows only the human player's moves")
+	tap(JOY_BUTTON_B);check(game.paused and not game.pause_moves_open,"B returns from Moves List to pause")
+	navigate(JOY_BUTTON_DPAD_DOWN)
 	navigate(JOY_BUTTON_DPAD_RIGHT);tap(JOY_BUTTON_A)
 	check(game.paused and game.options_open,"Controller can focus and activate pause Options")
 	navigate(JOY_BUTTON_DPAD_DOWN,6);tap(JOY_BUTTON_A)

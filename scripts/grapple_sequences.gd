@@ -1,6 +1,6 @@
 extends RefCounted
 ## Paired, keyed poses. Damage belongs to visible impacts, never the initial grip.
-const NORMAL=["shoulder","sweep","hip","hip","hip","sweep","suplex","hold","suplex","armbar","shoulder","cloak","hold","tackle"]
+const NORMAL=["shoulder","sweep","hip","hip","hip","sweep","slam","hold","suplex","armbar","shoulder","cloak","hold","tackle"]
 const DURATION=[24,22,24,23,22,22,28,44,28,24,24,26,44,23]
 const COMMAND={0:"slam",6:"choke",8:"piledriver",9:"armbar"}
 const AIR=[4,5,10,13]
@@ -16,15 +16,15 @@ static func place(a:Dictionary,b:Dictionary,scale:float,floor_y:float,left:float
 	var frame=int(a.grab_frame)
 	var impact=int(p.impact)
 	var t=clampf(float(frame-5)/maxf(1,impact-5),0,1)
-	var dir=float(a.throw_dir)
+	var dir=a.grab_facing
 	a.x=clampf(a.grab_origin_x,left+15,right-15)
 	a.y=floor_y
 	a.grapple_pose=0 if frame<5 else (1 if t<.52 else 2)
 	a.grapple_role="attacker"
-	a.facing=int(dir) if frame>=5 else a.grab_facing
+	a.facing=dir
 	b.grapple_role="victim";b.grapple_pose=-2
 	b.throw_rotation=0.0;b.throw_flight=false
-	b.facing=-a.grab_facing
+	b.facing=-dir
 	var distance=48.0
 	var lift=0.0
 	if p.hold:
@@ -42,9 +42,8 @@ static func place(a:Dictionary,b:Dictionary,scale:float,floor_y:float,left:float
 				if frame>=5: b.grapple_pose=3
 			"suplex":
 				if frame>=5:
-					a.facing=-int(dir)
-					distance=lerpf(-12,97,smoothstep(.2,1,t))
-					lift=sin(t*PI)*90
+					distance=lerpf(42,108,smoothstep(.25,1,t))
+					lift=lerpf(94,0,smoothstep(.55,1,t))
 			"slam","choke","piledriver":
 				if frame>=5:
 					a.grapple_pose=5 if t<.5 else 2
@@ -58,7 +57,6 @@ static func place(a:Dictionary,b:Dictionary,scale:float,floor_y:float,left:float
 				a.grapple_pose=5 if t<.65 else 2
 				distance=lerpf(35,95,t)
 				lift=maxf(0,(floor_y-a.y)/scale)+sin(t*PI)*32
-		if frame>=5: b.facing=-int(dir)
 		if frame>=impact: b.grapple_pose=3;distance=108;lift=0
 	# Keep the pair inside the stage without bending or stretching either sprite.
 	var x=a.x+dir*distance*scale

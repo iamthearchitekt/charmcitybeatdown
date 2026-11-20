@@ -1,6 +1,7 @@
 extends RefCounted
 ## Sprite-local palette flashes and pixel effects; never alter stage lighting.
 const Combat=preload("res://scripts/combat.gd")
+const ActionFX=preload("res://scripts/action_fx.gd")
 const PIXEL_UNIT=.9
 var palettes:Dictionary={}
 var flame_frames:Array=[]
@@ -14,8 +15,8 @@ static func active(f:Dictionary,m:Dictionary)->bool:
 static func palette(f:Dictionary,m:Dictionary)->String:
 	if active(f,m) and m.element=="electric":
 		var phase=int(f.frame-m.startup)%8
-		return "white" if phase<2 else ("gold" if phase<4 else "")
-	if f.get("element_timer",0)>0 and f.element_hit=="electric": return "electric"
+		return "cyan" if phase<2 else ("gold" if phase<4 else "")
+	if f.get("element_timer",0)>0 and f.element_hit=="electric" and f.element_timer%6>=2: return "electric"
 	return ""
 
 func tinted(texture:Texture2D,mode:String)->Texture2D:
@@ -30,8 +31,8 @@ func tinted(texture:Texture2D,mode:String)->Texture2D:
 			var l=c.r*.299+c.g*.587+c.b*.114
 			var col=Color.WHITE
 			match mode:
-				"white": col=Color(.88+.12*l,.92+.08*l,1)
-				"gold": col=Color(1,.64+.36*l,.12+.7*l)
+				"cyan": col=Color(.14+.25*l,.61+.36*l,.8+.2*l)
+				"gold": col=Color(1,.56+.33*l,.08+.21*l)
 				"electric": col=Color(.12+.52*l,.25+.7*l,.55+.45*l)
 			col.a=c.a;pixels.set_pixel(x,y,col)
 	var result=ImageTexture.create_from_image(pixels)
@@ -44,11 +45,12 @@ func prepare(art):
 		flame_frames.append(fire_palette(art.pixel_texture(sheet,Rect2(frame*543+4,174,535,356),Vector2(108,70.2))))
 	var electricity=art.raw_texture("res://assets/electric-arcs.png")
 	for frame in 4:
-		electric_frames.append(art.pixel_texture(electricity,Rect2(frame*362+20,260,325,560),Vector2(108,176.4)))
+		var bolts=art.pixel_texture(electricity,Rect2(frame*362+20,260,325,560),Vector2(108,176.4))
+		electric_frames.append(ImageTexture.create_from_image(ActionFX.colorize(bolts.get_image(),"blue",.93)))
 	var moves=art.move_tables.fighters[6].moves.special3
 	for frame in [0,8,12,44]:
 		var sprite=art.signature_art.sprite({"kind":6,"frame":frame},moves,art)
-		for mode in ["white","gold"]: tinted(sprite.texture,mode)
+		for mode in ["cyan","gold"]: tinted(sprite.texture,mode)
 
 func prepare_reaction(kind:int,art):
 	load_reaction_atlas()
@@ -71,8 +73,10 @@ func draw_reaction(canvas:Node2D,f:Dictionary,pose_key:String,rect:Rect2,body:Te
 	if entry.is_empty() or Vector2(entry.size[0],entry.size[1])!=body.get_size(): return
 	var region:Array
 	var opacity=1.0
-	if f.element_hit=="electric" and entry.has("xray") and effect_age(f,Combat.ELECTRIC_REACTION_TICKS)%6<3:
+	var tint=Color.WHITE
+	if f.element_hit=="electric" and entry.has("xray") and effect_age(f,Combat.ELECTRIC_REACTION_TICKS)%9<5:
 		region=entry.xray
+		tint=Color("56dcff")
 	elif f.element_hit=="fire":
 		var age=effect_age(f,Combat.FIRE_REACTION_TICKS)
 		region=entry.fire[int(age/3)%entry.fire.size()]
@@ -80,17 +84,21 @@ func draw_reaction(canvas:Node2D,f:Dictionary,pose_key:String,rect:Rect2,body:Te
 	else: return
 	var source=Rect2(region[0],region[1],region[2],region[3])
 	var target=Rect2(rect.position+Vector2(region[4],region[5])*PIXEL_UNIT,source.size*PIXEL_UNIT)
-	canvas.draw_texture_rect_region(reaction_atlas,target,source,Color(1,1,1,opacity))
+	tint.a=opacity
+	canvas.draw_texture_rect_region(reaction_atlas,target,source,tint)
 
 func fire_palette(texture:Texture2D)->Texture2D:
 	# Deliberate arcade color clusters replace smooth source-art gradients.
 	# Resolution and opaque pixel grid remain identical to fighter textures.
-	var colors=[Color("9b2106"),Color("cf3705"),Color("ed5908"),Color("ff850d"),Color("ffa919"),Color("ffd53d"),Color("ffe86c"),Color("fff4b0")]
+	var colors=[Color("9b2106"),Color("cf3705"),Color("ed5908"),Color("ff850d"),Color("ffa919"),Color("ffd53d"),Color("ffdf57")]
 	var pixels=texture.get_image()
 	for y in pixels.get_height():
 		for x in pixels.get_width():
 			var c=pixels.get_pixel(x,y)
 			if c.a<.5: continue
+			if c.get_luminance()>=.91:
+				pixels.set_pixel(x,y,Color.WHITE)
+				continue
 			var best=colors[0];var distance=10.0
 			for candidate in colors:
 				var delta=Vector3(c.r-candidate.r,c.g-candidate.g,c.b-candidate.b).length_squared()
@@ -105,7 +113,7 @@ func draw_aura(canvas:Node2D,f:Dictionary,m:Dictionary,rect:Rect2,texture:Textur
 		var offset=Vector2(rect.get_center().x-size.x*.5,rect.end.y-size.y+1.8).snapped(Vector2(PIXEL_UNIT,PIXEL_UNIT))
 		canvas.draw_texture_rect(electric_frames[int(age/2)%4],Rect2(offset,size),false)
 	if not active(f,m) or m.element!="electric": return
-	var glow=tinted(texture,"gold" if int(f.frame/2)%2==0 else "white")
+	var glow=tinted(texture,"gold" if int(f.frame/2)%2==0 else "cyan")
 	for offset in [Vector2(-1.8,0),Vector2(1.8,0),Vector2(0,-1.8)]:
 		canvas.draw_texture_rect(glow,Rect2(rect.position+offset,rect.size),false,Color(1,1,1,.85))
 

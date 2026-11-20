@@ -1,7 +1,14 @@
 extends RefCounted
 const GroundShadow=preload("res://scripts/ground_shadow.gd")
+const Combat=preload("res://scripts/combat.gd")
 ## Three independent targets on EACH side: all six are required.
-const BODY=Rect2(432,362,416,260)
+const ART_SCALE=1.16
+const SIZE=Vector2(416,260)*ART_SCALE
+const BODY=Rect2(640.0-SIZE.x*.5,Combat.FLOOR-SIZE.y,SIZE.x,SIZE.y)
+const BANDS=[0.0,.325,.64,1.0]
+const ROOF_HALF_WIDTH=142.0*ART_SCALE
+const ROOF_HEIGHT=222.0*ART_SCALE
+const FENDER_HEIGHT=141.0*ART_SCALE
 const MAX_HP=[350,400,350,350,400,350]
 const LABELS=["L GLASS","L HOOD","L BUMPER","R GLASS","R HOOD","R BUMPER"]
 var hp:Array=[350,400,350,350,400,350]
@@ -46,9 +53,11 @@ func target(side:int,attack:Rect2,move:String="")->int:
 func hitbox(zone:int)->Rect2:
 	# Punch/high kick -> glass; crouching jab -> hood; crouching kick -> bumper.
 	# Each bank is reachable exclusively from its corresponding physical side.
-	var tops=[332.0,446.5,528.4]
-	var bottoms=[446.5,528.4,622.0]
-	return Rect2(BODY.position.x if zone<3 else BODY.get_center().x,tops[zone%3],BODY.size.x*.5,bottoms[zone%3]-tops[zone%3])
+	var band=zone%3
+	var top=BODY.position.y+float(BANDS[band])*BODY.size.y
+	var bottom=BODY.position.y+float(BANDS[band+1])*BODY.size.y
+	if band==0: top-=30.0*ART_SCALE
+	return Rect2(BODY.position.x if zone<3 else BODY.get_center().x,top,BODY.size.x*.5,bottom-top)
 
 func damage(zone:int,amount:int,position:Vector2)->bool:
 	if zone<0 or hp[zone]<=0: return false
@@ -74,10 +83,9 @@ func damage_frame(zone:int)->int:
 func draw(canvas:Node2D,tick:int):
 	load_art()
 	if textures.size()!=4: return
-	GroundShadow.draw(canvas,Vector2(BODY.get_center().x,BODY.end.y-4),BODY.size.x*.46,11.0,.22)
+	GroundShadow.draw(canvas,Vector2(BODY.get_center().x,BODY.end.y-4),BODY.size.x*.46,11.0*ART_SCALE,.22)
 	# The subtly angled frontal sprite has three target bands in each half.
 	# Equal source canvases preserve registration throughout independent damage.
-	var rows=[0.0,.325,.64,1.0]
 	# Requested facing: reveal the side on screen LEFT. Mirror the artwork,
 	# but swap source banks so world-left damage stays on world-left targets.
 	canvas.draw_set_transform(Vector2(BODY.get_center().x*2,0),0,Vector2(-1,1))
@@ -86,7 +94,7 @@ func draw(canvas:Node2D,tick:int):
 		var shift=Vector2((1 if tick%2==0 else -1)*2,0) if hit_flash[zone]>0 else Vector2.ZERO
 		var row=zone%3
 		var x=.5 if zone<3 else 0.0
-		var normalized=Rect2(x,rows[row],.5,rows[row+1]-rows[row])
+		var normalized=Rect2(x,BANDS[row],.5,BANDS[row+1]-BANDS[row])
 		var dest=Rect2(BODY.position+normalized.position*BODY.size+shift,normalized.size*BODY.size)
 		var source=Rect2(normalized.position*tex.get_size(),normalized.size*tex.get_size())
 		canvas.draw_texture_rect_region(tex,dest,source,Color(1.12,1.12,1.12) if hit_flash[zone]>0 else Color.WHITE)

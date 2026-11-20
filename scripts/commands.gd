@@ -20,8 +20,9 @@ func reset():
 	kick_presses.clear();punch_presses.clear();down_charge=0;charge_ready=0
 	back_charge=0;back_ready=0
 
-func sample(direction: int, buttons: Array, kit:Dictionary={}) -> String:
+func sample(direction: int, buttons: Array, kit:Dictionary={}, suppress_punch_mash:bool=false) -> String:
 	clock += 1
+	if suppress_punch_mash: punch_presses.clear()
 	charge_ready=maxi(0,charge_ready-1)
 	if direction in [1,2,3]: down_charge+=1
 	else:
@@ -84,10 +85,10 @@ func sample(direction: int, buttons: Array, kit:Dictionary={}) -> String:
 			history.clear()
 			return "special1"
 		var palm_barrage=with_input(kit,"mash_punch")
-		if palm_barrage!="":
+		if palm_barrage!="" and not suppress_punch_mash:
 			punch_presses.append(clock)
-			while not punch_presses.is_empty() and clock-punch_presses[0]>23: punch_presses.pop_front()
-			if punch_presses.size()>=3:
+			while not punch_presses.is_empty() and clock-punch_presses[0]>24: punch_presses.pop_front()
+			if punch_presses.size()>=int(kit[palm_barrage].get("mash_presses",3)):
 				punch_presses.clear();history.clear()
 				return palm_barrage
 	for button in ["hk","hp","mk","mp","lk","lp"]:

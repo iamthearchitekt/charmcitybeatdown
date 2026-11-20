@@ -1,6 +1,16 @@
 extends RefCounted
 ## Authored native-resolution cuts of the fighter's own approved sprite art.
+const ActionFX=preload("res://scripts/action_fx.gd")
 const PIXEL=.9
+const TRAILS={
+	"palms":["streak",Rect2(43,-146,48,20)],
+	"rush":["streak",Rect2(-86,-70,64,25)],
+	"lariat":["sweep",Rect2(-38,-130,132,42)],
+	"bicycle":["rise",Rect2(24,-138,65,75)],
+	"spin":["sweep",Rect2(-64,-81,150,44)],
+	"flash_kick":["rise",Rect2(0,-161,97,119)],
+	"knee":["rise",Rect2(32,-113,50,70)],
+}
 var entries:Dictionary={}
 var by_fighter:Dictionary={}
 var sprites:Dictionary={}
@@ -30,33 +40,14 @@ func sprite(key:String)->Dictionary:
 	return result
 
 func draw_trail(canvas:Node2D,f:Dictionary,move:Dictionary):
-	if not move.has("style_fx") or f.frame<move.startup or f.frame>=move.startup+move.active: return
-	var phase=int(f.frame-move.startup)
-	match move.style_fx:
-		"palms":
-			for i in 3:
-				var x=53.0+(phase+i*5)%13
-				var y=-140.0+i*20.0+(phase+i)%4
-				canvas.draw_rect(Rect2(x,y,25-i*3,1.8),Color("c0acaa"))
-		"rush":
-			for i in 6:
-				var x=-65.0+((phase*3+i*11)%31)
-				canvas.draw_rect(Rect2(x,-14.0-i*12.0,12.0+i*2.0,1.8),Color("a38b76"))
-		"lariat":
-			sweep(canvas,Vector2(4,-105),Vector2(94,19),.05+phase*.24,Color("e6cfab"))
-		"bicycle":
-			sweep(canvas,Vector2(39,-82),Vector2(48,35),-1.1+phase*.24,Color("ffc69a"))
-		"spin":
-			sweep(canvas,Vector2(5,-55),Vector2(102,25),.2+phase*.21,Color("d0a9f0"))
-		"flash_kick":
-			sweep(canvas,Vector2(9,-73),Vector2(90,98),-.15-phase*.14,Color("e6c5ff"))
-		"knee":
-			sweep(canvas,Vector2(26,-62),Vector2(47,59),-.7-phase*.11,Color("ffc589"))
-
-func sweep(canvas:Node2D,center:Vector2,radii:Vector2,angle:float,color:Color):
-	for i in 20:
-		var t=angle-float(i)*.055
-		var point=(center+Vector2(cos(t),sin(t))*radii).snapped(Vector2(PIXEL,PIXEL))
-		var size=3.6 if i<9 else 1.8
-		canvas.draw_rect(Rect2(point-Vector2(1.8,1.8),Vector2(size+1.8,size+1.8)),color.darkened(.70))
-		canvas.draw_rect(Rect2(point,Vector2(size,size)),color.lightened(.10 if i<5 else 0.0))
+	var style:String=move.get("style_fx","")
+	if not TRAILS.has(style) or f.frame<move.startup or f.frame>=move.startup+move.active: return
+	var age=int(f.frame-move.startup)
+	var trail:Array=TRAILS[style]
+	var destination:Rect2=trail[1]
+	var phase=mini(3,int(4.0*age/move.active))
+	if style=="palms":
+		destination.position.y+=[0,13,5,17][mini(3,int(age/6))]
+		phase=[0,1,1,2,3,3][age%6]
+	var texture=ActionFX.frame(trail[0],phase,ActionFX.palette_for(f.kind))
+	canvas.draw_texture_rect(texture,destination,false,Color(1,1,1,.76))

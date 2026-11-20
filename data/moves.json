@@ -2192,6 +2192,7 @@
           "name": "Flash Fire",
           "animation": "chelsea-flame",
           "element": "fire",
+          "unblockable": true,
           "startup": 14,
           "active": 18,
           "recovery": 25,
@@ -3061,7 +3062,7 @@
           "cancels": []
         },
         "throw": {
-          "name": "Back Alley Suplex",
+          "name": "Back Alley Slam",
           "startup": 4,
           "active": 2,
           "recovery": 22,
@@ -3177,6 +3178,7 @@
           "input": "qcb_punch",
           "animation": "spike-shock",
           "element": "electric",
+          "unblockable": true,
           "startup": 8,
           "active": 36,
           "recovery": 22,
@@ -3570,6 +3572,7 @@
           "cancels": [],
           "projectile": true,
           "projectile_skin": "shear",
+          "projectile_voice": "sonic_boom",
           "projectile_size": [
             53,
             22
@@ -4031,9 +4034,10 @@
         "special3": {
           "name": "Redline Palms",
           "input": "mash_punch",
+          "mash_presses": 4,
           "startup": 8,
           "active": 24,
-          "recovery": 22,
+          "recovery": 30,
           "damage": 34,
           "hitstun": 15,
           "blockstun": 9,
@@ -4835,7 +4839,7 @@
           "cancel_end": 0,
           "cancels": [],
           "projectile": true,
-          "projectile_skin": "tower",
+          "projectile_skin": "yellow",
           "projectile_size": [
             50,
             25
@@ -4948,7 +4952,7 @@
           "cancel_end": 0,
           "cancels": [],
           "projectile": true,
-          "projectile_skin": "tower-low",
+          "projectile_skin": "yellow",
           "projectile_size": [
             50,
             23
@@ -5777,7 +5781,8 @@
       "locked": true,
       "select_name": "THE BIRD",
       "guard_slide_scale": 0.9,
-      "trait": "HOLDS GROUND ON BLOCK"
+      "damage_taken_scale": 0.85,
+      "trait": "TAKES 15% LESS DAMAGE"
     },
     {
       "id": "lamar-jackson",
@@ -6103,6 +6108,7 @@
         },
         "special1": {
           "name": "Raven Pulse",
+          "projectile_skin": "violet",
           "startup": 11,
           "active": 1,
           "recovery": 20,

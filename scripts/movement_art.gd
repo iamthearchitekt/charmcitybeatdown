@@ -10,7 +10,7 @@ func frame_index(f:Dictionary,kit:Dictionary)->int:
 	return CombatPose.movement(f,kit)
 
 func sprite(kind:int,frame:int,art)->Dictionary:
-	var key=kind*4+frame
+	var key=Vector2i(kind,frame)
 	if cache.has(key): return cache[key]
 	var entry=entries[str(kind)]
 	if not textures.has(entry.path): textures[entry.path]=art.raw_texture(entry.path)

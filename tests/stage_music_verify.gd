@@ -12,7 +12,7 @@ func run():
 	check(game.menu_music.stream.resource_name=="title-street-of-rage.mp3" and game.menu_music.playing,"New supplied Street of Rage track plays on the title screen")
 	check(game.menu_music.stream.loop and game.menu_music.stream.get_length()>15,"Title MP3 decodes and loops without requiring an editor import")
 	game.selected_mode=1;game.begin_match();game.sim.phase="fight"
-	var expected=["go-straight.ogg","back-to-the-industry.ogg","alien-power.ogg","go-straight.ogg","never-return-alive.ogg","revenge-of-mr-x.ogg","back-to-the-industry.ogg"]
+	var expected=["go-straight.ogg","back-to-the-industry.ogg","alien-power.ogg","go-straight.ogg","never-return-alive.ogg","revenge-of-mr-x.ogg","back-to-the-industry.ogg","alien-power.ogg","go-straight.ogg","go-straight.ogg","back-to-the-industry.ogg"]
 	for index in expected.size():
 		game.stage.set_stage(index);game.sync_match_end_audio()
 		check(game.music.stream.resource_name==expected[index] and game.music.playing,"Correct stage track: "+game.stage.stage_name())

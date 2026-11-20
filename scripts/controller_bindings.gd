@@ -1,8 +1,9 @@
 extends RefCounted
 # Controller-only configuration. Keyboard bindings never pass through this class.
 const STEPS=["left","right","up","down","lp","mp","hp","lk","mk","hk","throw","throw_right"]
-const LABELS=["D-PAD LEFT","D-PAD RIGHT","D-PAD UP","D-PAD DOWN","X  /  LIGHT PUNCH","Y  /  MEDIUM PUNCH","Z  /  HEAVY PUNCH","A  /  LIGHT KICK","B  /  MEDIUM KICK","C  /  HEAVY KICK","L  /  GRAPPLE","R  /  GRAPPLE"]
-const ACTIONS=["lp","mp","hp","lk","mk","hk","throw","throw_right","pause","confirm","back"]
+const LABELS=["D-PAD LEFT","D-PAD RIGHT","D-PAD UP","D-PAD DOWN","A  /  LIGHT PUNCH","B  /  MEDIUM PUNCH","C  /  HEAVY PUNCH","X  /  LIGHT KICK","Y  /  MEDIUM KICK","Z  /  HEAVY KICK","L  /  GRAPPLE","R  /  GRAPPLE"]
+const ACTIONS=["lp","mp","hp","lk","mk","hk","throw","throw_right","pause","confirm","back","cheat_clear"]
+const ATTACK_LAYOUT_VERSION=2
 # The user's confirmed primary controller is a Retro-Bit Sega pad. Windows may
 # identify it as an Xbox/ generic device, so its layout cannot rely on the name.
 var primary_layout="retrobit"
@@ -47,24 +48,39 @@ func defaults()->Dictionary:
 func mapping(id:int)->Dictionary:
 	var identity=devices.get(id,"")
 	var saved:Dictionary=profiles.get(identity,{})
-	if saved.has("mp") and saved.has("mk") and saved.has("throw_right"): return saved
-	var result=defaults()
 	var name=identity.to_lower().replace("-","").replace(" ","")
-	if (slots.find(id)==0 and primary_layout=="retrobit") or "retrobit" in name:
+	var sega=(slots.find(id)==0 and primary_layout=="retrobit") or "retrobit" in name
+	if saved.has_all(STEPS):
+		var effective=saved.duplicate()
+		var bottom_punches=int(saved.get("attack_layout",1))>=ATTACK_LAYOUT_VERSION
+		if sega and not bottom_punches: swap_attack_rows(effective)
+		effective.cheat_clear=effective.hp if sega or bottom_punches else effective.hk
+		return effective
+	var result=defaults()
+	if sega:
 		# On Retro-Bit Bluetooth, physical Z and C report as trigger axes.
 		result.hp={"axis":JOY_AXIS_TRIGGER_LEFT,"sign":1}
 		result.throw_right={"button":JOY_BUTTON_RIGHT_SHOULDER}
+		swap_attack_rows(result)
+	result.cheat_clear=result.hp if sega else result.hk
 	# Preserve calibrated directions from older profiles. The former attack
 	# layout is replaced as a group to avoid duplicate face/shoulder mappings.
 	for direction in STEPS.slice(0,4):
 		if saved.has(direction): result[direction]=saved[direction]
 	return result
 
+func swap_attack_rows(bindings:Dictionary):
+	for pair in [["lp","lk"],["mp","mk"],["hp","hk"]]:
+		var punch=bindings[pair[0]]
+		bindings[pair[0]]=bindings[pair[1]]
+		bindings[pair[1]]=punch
+
 func save_mapping(id:int,bindings:Dictionary)->Error:
 	if not devices.has(id): return ERR_DOES_NOT_EXIST
 	var identity=devices[id]
 	var old=profiles.duplicate(true)
 	profiles[identity]=bindings.duplicate(true)
+	profiles[identity].attack_layout=ATTACK_LAYOUT_VERSION
 	config.set_value("controllers","profiles",profiles)
 	var error=config.save(path)
 	if error!=OK: profiles=old

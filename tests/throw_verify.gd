@@ -18,10 +18,12 @@ func run():
 			for i in 100:
 				s.step([{},{}]);held=held or b.grabbed_by==0;paired=paired or b.grapple_role=="victim";rotated=rotated or absf(b.throw_rotation)>.5
 			check(held and paired and not rotated,"Authored paired grab and release without rotating a standing body: fighter "+str(kind)+" back="+str(back))
-			check(b.health==1000-int(s.data.fighters[kind].moves.throw.damage),"Throw damages exactly once through guard")
+			var resistance=.85 if b.kind==12 else 1.0
+			var damage=roundi(int(s.data.fighters[kind].moves.throw.damage)*resistance)
+			check(b.health==Combat.MAX_HEALTH-damage,"Throw damages exactly once through guard")
 			check(b.grabbed_by<0 and a.throw_target<0 and b.y==Combat.FLOOR,"Pair releases and lands normally")
-			check((b.x<a.x) if back else (b.x>a.x),"Throw direction selects landing side")
-			check(b.facing==(1 if back else -1),"Landing pose keeps the head away from opponent")
+			check(b.x>a.x,"Throw lands in front, including when holding Back")
+			check(b.facing==-1,"Landing pose keeps the head away from opponent")
 		var s=setup(kind);s.wins=[1,0];s.fighters[1].health=1
 		s.step([{"command":"throw"},{}])
 		for i in 100: s.step([{},{}])

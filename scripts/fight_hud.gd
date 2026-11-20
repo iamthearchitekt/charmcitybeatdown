@@ -20,9 +20,9 @@ static func fill_rect(health:float,right:bool)->Rect2:
 	var width=roundf(RAIL_WIDTH*clampf(health/MAX_HEALTH,0.0,1.0))
 	return Rect2(354.0 if right else 286.0-width,29.0,width,12.0)
 
-func tile(canvas:Node2D,key:String,x:float,y:float,align:int=0):
+func tile(canvas:Node2D,key:String,x:float,y:float,align:int=0,tint:Color=Color.WHITE):
 	var source:Rect2=tiles[key]
-	canvas.draw_texture_rect_region(atlas,scaled(Rect2(Vector2(roundf(x-source.size.x*align*.5),y),source.size)),source)
+	canvas.draw_texture_rect_region(atlas,scaled(Rect2(Vector2(roundf(x-source.size.x*align*.5),y),source.size)),source,tint)
 
 func print_small(canvas:Node2D,label:String,x:float,y:float,align:int=0):
 	var advance=8
@@ -46,9 +46,8 @@ func draw(canvas:Node2D,sim,mode:int,points:Array,round_label:String):
 			if fill.size.x<RAIL_WIDTH:
 				var leading=fill.end.x-1 if right else fill.position.x
 				canvas.draw_rect(scaled(Rect2(leading,29,1,11)),Color("fff1b5"))
-		tile(canvas,"portrait-%d-%d" % [fighter.kind,i],596 if right else 10,13)
 		tile(canvas,"name-%d" % fighter.kind,594 if right else 45,47,2 if right else 0)
-		var role="1P" if not right else ["CPU","2P","TRAINING"][mode]
+		var role="1P" if not right else ["CPU","2P","TRAINING","2P"][mode]
 		tile(canvas,role,594 if right else 45,14,2 if right else 0)
 		var score_edge=594-tiles[role].size.x-5 if right else 69
 		print_small(canvas,str(points[i]).pad_zeros(7),score_edge,14,2 if right else 0)

@@ -25,5 +25,10 @@ func run():
 	for kind in [1,3,4,5,9]:
 		var sheet="brook-vivian-motion-final.png" if kind in [1,5] else "female-motion-slender.png"
 		check(movement[str(kind)].path.ends_with(sheet) and jumps[str(kind)].path==movement[str(kind)].path,"Walk and jump share reviewed female sheet: "+str(kind))
+	var cast_widths={"7":263,"10":287,"11":290,"12":384,"13":413}
+	for kind in cast_widths:
+		check(int(movement[kind].regions[3][2])==cast_widths[kind],"Cast release contains the entire rear boot: "+kind)
+	var lamar:Dictionary=movement["13"]
+	check(int(lamar.regions[2][2])==309 and int(lamar.regions[2][3])==374 and lamar.anchors[2]==152,"Lamar's full windup silhouette is centered independently of the release")
 	print("SPRITE CONSISTENCY RESULT: ",checks-failures," passed; ",failures," failed")
 	quit(1 if failures else 0)

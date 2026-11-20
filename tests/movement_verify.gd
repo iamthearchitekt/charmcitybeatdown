@@ -1,6 +1,7 @@
 extends SceneTree
 const Combat=preload("res://scripts/combat.gd")
 const Movement=preload("res://scripts/movement_art.gd")
+const Pose=preload("res://scripts/combat_pose.gd")
 const Projectile=preload("res://scripts/arcade_projectile.gd")
 var checks=0
 var failures=0
@@ -17,7 +18,8 @@ func run():
 		var seen={}
 		for frame in 40:
 			s.step([{"dx":1},{}]);seen[movement.frame_index(s.fighters[0],{})]=true
-		check(seen.has(0) and seen.has(1) and s.fighters[0].walk_phase>1,"Actual movement alternates both walk phases: "+str(kind))
+		var walk_frames=Pose.LAMAR_WALK_FRAMES if kind==13 else [0,1]
+		check(walk_frames.all(func(frame): return seen.has(frame)),"Actual movement reaches every walk phase: "+str(kind))
 		var f=s.fighters[0];f.walk=0
 		check(movement.frame_index(f,{})==-1,"Stopping restores the original idle pose: "+str(kind))
 		f.walk=1;f.backstep_pose=1
@@ -26,15 +28,16 @@ func run():
 		var kit=s.data.fighters[kind].moves.special1
 		if kit.get("projectile",false):
 			casters+=1;f.move="special1";f.frame=0
-			check(entry.regions.size()==4 and movement.frame_index(f,kit)==2,"Projectile startup uses gathered two-handed charge: "+str(kind))
+			check(entry.regions.size()==walk_frames.size()+2 and movement.frame_index(f,kit)==2,"Projectile startup uses gathered two-handed charge: "+str(kind))
 			f.frame=int(kit.startup)
 			check(movement.frame_index(f,kit)==3,"Projectile launch uses two-handed forward release: "+str(kind))
 		else:
 			check(entry.regions.size()==2,"Rush fighters retain their existing special animation: "+str(kind))
-	check(count==46 and casters==9,"All28 walking and18 casting poses are registered")
+	check(count==50 and casters==9,"All 32 walking and 18 casting poses are registered")
 	var p=Projectile.new();var opaque=0;var purple=0;var same_alpha=true
 	for frame in 4:
-		var violet=p.violet_frames[frame].get_image();var blue=p.frames[frame].get_image()
+		var violet=p.pulse_texture("violet",frame*2,13).get_image()
+		var blue=p.pulse_texture("",frame*2,0).get_image()
 		for y in violet.get_height():
 			for x in violet.get_width():
 				var c=violet.get_pixel(x,y)
@@ -42,7 +45,7 @@ func run():
 				if c.a>.5:
 					opaque+=1
 					if c.b>c.g and c.r>c.g: purple+=1
-	check(same_alpha and opaque>1000 and purple==opaque,"All four violet projectile frames retain geometry and use UV purple")
+	check(same_alpha and opaque>1000 and purple>opaque*.35,"Violet plasma keeps the blue plasma silhouette and has a purple outer sprite")
 	check(s.data.fighters[11].moves.special1.projectile_skin=="violet" and s.data.fighters[6].moves.special1.projectile_skin=="fire","Poe violet and Spike fire remain separate skins")
 	print("MOVEMENT RESULT: ",checks-failures," passed; ",failures," failed")
 	quit(1 if failures else 0)

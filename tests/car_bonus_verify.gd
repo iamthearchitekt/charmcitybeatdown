@@ -10,7 +10,9 @@ func check(ok:bool,label:String):
 
 func play_attack(s,move:String,low:bool):
 	s.step([{"command":move,"down":low},{}])
-	for frame in 34: s.step([{"down":low},{}])
+	for frame in 40:
+		if s.fighters[0].move=="" and s.freeze==0: break
+		s.step([{"down":low},{}])
 
 func break_bank(s,start:int):
 	for zone in range(start,start+3):
@@ -22,6 +24,7 @@ func break_bank(s,start:int):
 func run():
 	var c=Car.new()
 	check(c.hp.size()==6 and not c.destroyed(),"Six independent zones: three on each side")
+	check(Car.BODY.size.x>480 and is_equal_approx(Car.BODY.end.y,Bonus.FLOOR),"Larger car stays anchored to the pavement")
 	var before=c.hp.duplicate()
 	c.damage(0,100,Vector2(448,420))
 	check(c.hp[0]==before[0]-100 and c.hp.slice(1)==before.slice(1),"Hitting one zone never damages the other five")
@@ -44,7 +47,7 @@ func run():
 		check(s.fighters[0].x>=Car.BODY.end.x+34 and s.fighters[0].y==s.FLOOR,"Normal up+direction clears car and lands opposite: fighter "+str(kind))
 		s.fighters[0].x=Car.BODY.end.x+34
 		break_bank(s,3)
-		check(s.success and s.phase=="results" and s.time_left>0,"All six zones can be destroyed within 30 seconds: fighter "+str(kind))
+		check(s.success and s.phase=="results" and s.time_left>0,"All six zones can be destroyed within 25 seconds: fighter "+str(kind))
 		check(total_before<Bonus.DURATION,"Time elapses during attacks and hitstop")
 	var s=Bonus.new();s.begin(0);s.phase="fight";s.fighters[0].x=Car.BODY.position.x-34
 	s.step([{"dx":1},{}]);check(s.fighters[0].x==Car.BODY.position.x-34,"Grounded walking cannot pass through the car")
@@ -62,6 +65,18 @@ func run():
 	game.set_process_input(false);game.set_physics_process(false)
 	game.stage.history_path="res://.runtime/car-stage-test.cfg"
 	game.bonus_rewards.path="res://.runtime/car-rewards-test.cfg";game.bonus_rewards.earned=[]
+	game.selected_mode=1;game.begin_match();game.sim.phase="fight"
+	game.sim.fighters[0].x=926;game.sim.fighters[1].x=1146
+	for frame in 60: game.update_camera(1.0/60)
+	check(game.stage.panoramic and game.world.position.x<0,"Normal fights still pan at the right edge")
+	for kind in ["car","kegs","boxes"]:
+		game.begin_bonus(kind);game.sim.phase="fight"
+		var backdrop=game.stage.backdrop
+		check(game.world.position==Vector2.ZERO and backdrop.position==Vector2.ZERO and not game.stage.panoramic,"Bonus restores the original framing on entry: "+kind)
+		for x in [95.0,600.0,1170.0]:
+			game.sim.fighters[0].x=x
+			game.update_camera(.25)
+			check(game.world.position==Vector2.ZERO and (backdrop.texture.get_size()*backdrop.scale).is_equal_approx(Vector2(1280,720)),"Bonus framing stays fixed at x=%s: %s" % [x,kind])
 	for cue in ["car_clang","car_glass","car_break","car_destroyed"]:
 		check(game.sfx.config.cues.has(cue),"Car-specific supplied sound cue is available: "+cue)
 	game.begin_bonus();game.sfx.stop_all()
@@ -76,7 +91,7 @@ func run():
 	game.selected_mode=0;game.begin_match()
 	for win in 4:
 		game.sim.winner=0;game.sim.phase="results";game.account_completed_stage();game.account_completed_stage()
-		check(game.arcade_wins==win+1,"Completed fight counted exactly once: "+str(win+1))
+		check(game.arcade.cursor==win+1,"Completed fight counted exactly once: "+str(win+1))
 		if win%2==1:
 			game.action("confirm")
 			check(game.sim is Bonus and game.stage.at_bonus,"Bonus appears after every second won fight")
@@ -88,8 +103,8 @@ func run():
 		game.action("confirm")
 		check(not game.sim is Bonus and not game.stage.at_bonus,"Continue returns to a randomized normal fight")
 	game.selected_mode=1;game.begin_match();game.sim.phase="results";game.sim.winner=0
-	var count=game.arcade_wins;game.account_completed_stage()
-	check(game.arcade_wins==count,"Versus does not advance solo bonus progression")
+	var count=game.arcade.cursor;game.account_completed_stage()
+	check(game.arcade.cursor==count,"Versus does not advance solo bonus progression")
 	game.begin_bonus();game.sim.phase="fight";game.toggle_pause()
 	var time=game.sim.time_left;var clock=game.clock;game._physics_process(1.0/60)
 	check(time==game.sim.time_left and clock==game.clock,"Pause freezes bonus timer and two-frame background")

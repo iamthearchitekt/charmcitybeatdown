@@ -16,6 +16,7 @@ The user-supplied `02 - Go Straight.mp3` is copied unchanged as `go-straight.mp3
 | Block contact | 22_attack_block |
 | Attack whoosh, jump, dash, rush, uppercut | 59_whoosh, 5D_whoosh_2 |
 | Projectile launch | 5C_zap_2 |
+| Eric's Pit Lane Shear voice | 46_guile_sonicboom on projectile spawn |
 | Spike's Live Wire | 5C_zap_2 on activation and twice during the burst, 5B_zap_1 on contact |
 | Chelsea's Flash Fire | 45_dhalsim_flame layered with 5D_whoosh_2 on activation |
 | Normal / hard landing | 12_thud_1 |

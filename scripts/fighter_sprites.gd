@@ -294,13 +294,15 @@ func draw(canvas:Node2D,f:Dictionary,t:float,scale:float=1.0,portrait_mode:bool=
 	# soles to the simulation floor instead of letting the crop margin lift them.
 	var paired_pose=f.get("grapple_role","")!=""
 	if paired_pose or (not held and not tossed): origin.y+=float(sprite.ground_gap)*scale
-	var rotation=0.0
 	if (held or tossed) and not paired_pose:
 		origin.y-=size.y*.5*scale
 		top=-size.y*.5
 		anchor=size.x*.5
-		rotation=f.get("throw_rotation",0.0)
-	canvas.draw_set_transform(origin,rotation,Vector2(f.facing*scale,scale))
+		canvas.draw_set_transform(origin,f.get("throw_rotation",0.0),Vector2(f.facing*scale,scale))
+	else:
+		var lean=0.0 if portrait_mode else CombatPose.impact_shear(f)
+		# A clean hit can lean the upper body with the soles planted.
+		canvas.draw_set_transform_matrix(Transform2D(Vector2(f.facing*scale,0),Vector2(-lean*scale,scale),origin))
 	var rect=Rect2(-anchor,top,size.x,size.y)
 	var element_move=move_tables.fighters[f.kind].moves.get(f.move,{}) if not portrait_mode else {}
 	if not portrait_mode:

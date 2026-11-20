@@ -1,4 +1,6 @@
 CHARM CITY BEATDOWN - verification
+PASS Damage resistance on strikes, chip and grabs is reserved for Oriole Bird: 1
+PASS Damage resistance on strikes, chip and grabs is reserved for Oriole Bird: 12
 PASS Fourteen fighter appearances with editable move sets
 PASS MARCUS full move kit and frame data
 PASS BROOK LYNNE full move kit and frame data
@@ -33,6 +35,10 @@ PASS Heavy punch has readable startup
 PASS Whiffing attacks do not hit at a distance
 PASS Corner boundaries and pushbox separation
 PASS Jump-over side switch updates facing
+PASS Holding either player's Up repeats jumps only after landing
+PASS Releasing Up lets both fighters land and stay grounded
+PASS All fighters can cross a standing opponent with an ordinary forward jump: -1
+PASS All fighters can cross a standing opponent with an ordinary forward jump: 1
 PASS Harbor Current projectile travels and hits once
 PASS Rising special catches airborne opponent
 PASS Redline advancing special closes distance and hits
@@ -56,10 +62,14 @@ PASS Timeout awards round to higher health
 PASS Double KO replays without awarding either player
 PASS Training regenerates health and never ends match
 PASS CPU selects legal moves and successfully fights across round resets
+PASS Every Normal CPU initiates offense from range without throwing distant melee attacks
+PASS Poe uses ranged pressure and leaves a gap between shots
 PASS Normal CPU backs off and never walks into close pushbox pressure
 PASS CPU crouch-blocks some incoming shots and ignores shots moving away
-PASS CPU sometimes punishes a nearby missed heavy with a fast jab
+PASS CPU sometimes punishes a short recovery window with a fast jab
+PASS CPU favors heavy strikes if a close-range opening lasts long enough
 PASS Whiff punishment still respects the CPU cooldown
+PASS CPU reads and blocks some real heavy punches without perfect defense
 PASS Fighter 1 atlas: 16 nonempty in-bounds transparent sprite regions
 PASS Fighter 2 atlas: 16 nonempty in-bounds transparent sprite regions
 PASS Fighter 3 atlas: 16 nonempty in-bounds transparent sprite regions

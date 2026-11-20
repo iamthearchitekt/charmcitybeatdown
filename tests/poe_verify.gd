@@ -46,7 +46,7 @@ func run():
 	game.sim.phase="fight"
 	game.sync_match_end_audio()
 	check(game.stage.at_graveyard and game.stage.stage_name()=="WESTMINSTER / POE'S GRAVE","Poe graveyard selects the correct backdrop")
-	check(game.music.playing and game.music.stream.resource_name=="never-return-alive.ogg","Graveyard has continuous level music")
+	check(game.music.playing and game.current_stage_music_path==game.music_config.levels[game.stage.stage_name()],"Graveyard has continuous level music")
 	var first=await capture("graveyard-frame-1")
 	game.clock=.25
 	var second=await capture("graveyard-frame-2")

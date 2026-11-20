@@ -50,7 +50,7 @@ func run():
 	game.selected_mode=0
 	game.begin_bonus()
 	game.sim.phase="fight"
-	check(game.sim.time_left==30*60,"Car bonus starts with 30 seconds")
+	check(game.sim.time_left==25*60,"Car bonus starts with 25 seconds")
 	await capture("car-clean-hud")
 	game.sim.finish(true)
 	game.sync_match_end_audio()

@@ -50,8 +50,17 @@ func run():
 		check(mirror,"Both facings mirror every active region exactly: "+str(kind))
 		check(timing,"No strike contact during startup or recovery: "+str(kind))
 		f=s.make_fighter(kind,0);f.walk=1;f.walk_phase=0
-		var first=s.hurtboxes(f);f.walk_phase=1
-		check(Pose.key(f,{})=="movement:1" and first!=s.hurtboxes(f),"Walking updates collision on actual stride frame: "+str(kind))
+		var walk_frames=Pose.LAMAR_WALK_FRAMES if kind==13 else [0,1]
+		var previous_boxes:Array=[]
+		var follows_walk=true
+		for phase in walk_frames.size():
+			f.walk_phase=phase*.5 if kind==13 else float(phase)
+			var key="movement:"+str(walk_frames[phase])
+			var boxes=s.hurtboxes(f)
+			follows_walk=follows_walk and Pose.key(f,{})==key and s.collision.profiles[str(kind)].has(key)
+			follows_walk=follows_walk and not boxes.is_empty() and boxes!=previous_boxes
+			previous_boxes=boxes
+		check(follows_walk,"Walking updates collision on every stride frame: "+str(kind))
 		var connects=true
 		for name in ["lp","mp","hp","lk","mk","hk","c_lp","c_mp","c_lk","c_mk"]:
 			s.new_match(kind,(kind+1)%14);s.phase="fight"
@@ -65,7 +74,8 @@ func run():
 	var style_coverage=true
 	for key in styles:
 		style_coverage=style_coverage and s.collision.profiles[str(int(styles[key].kind))].has("style:"+key)
-	check(pose_count==471+styles.size() and style_coverage,"All original poses and every added style pose have collision profiles")
+	var added_walk_frames=Pose.LAMAR_WALK_FRAMES.size()-2
+	check(pose_count==471+added_walk_frames+styles.size() and style_coverage,"All original poses, new walk poses and style poses have collision profiles")
 	var alex=s.make_fighter(2,0);var jeff=s.make_fighter(10,0)
 	check(s.hurtbox(jeff).size.y>s.hurtbox(alex).size.y*1.1,"Tall Jeff and mid-sized Alex have different body geometry")
 	var f=s.make_fighter(0,0)

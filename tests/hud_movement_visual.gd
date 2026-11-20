@@ -1,4 +1,5 @@
 extends SceneTree
+const Combat=preload("res://scripts/combat.gd")
 var game
 var destination="res://tests/visual/hud-movement"
 func _initialize(): call_deferred("run")
@@ -38,8 +39,27 @@ func run():
 	game.sim.new_match(11,6);game.sim.phase="fight";game.sim.time_left=96*60
 	game.clock=0;await snap("poe-storm-0")
 	game.clock=.25;await snap("poe-storm-1")
-	game.sim.phase="intro";game.sim.phase_timer=140;game.sim.round_number=1;await snap("intro-round1")
+	game.sim.phase="intro";game.sim.phase_timer=140;game.sim.round_number=1;await snap("intro-stage-name")
+	game.sim.phase_timer=Combat.ROUND_ANNOUNCE_TICKS-12;await snap("intro-round1")
 	game.sim.round_number=2;await snap("intro-round2")
+	game.sim.round_number=3;game.sim.wins=[1,1];await snap("intro-final-round")
+	game.sim.phase="fight";game.sim.time_left=Combat.ROUND_TIME_TICKS;await snap("intro-fight-impact")
+	game.sim.time_left-=12;await snap("intro-fight-settled")
+	game.sim.time_left=98*60
+	game.sim.fighters[1].combo=12;game.sim.fighters[1].last_hit=game.sim.tick
+	await snap("combo-twelve-hits")
+	game.sim.training=true
+	await snap("training-combo")
+	game.sim.training=false
+	game.sim.fighters[1].health=0;game.sim.end_round()
+	await snap("round-end-ko")
+	for winner in [0,1]:
+		game.sim.new_match(11,6)
+		game.sync_match_end_audio()
+		game.selected_mode=0;game.fight_accounted=true
+		game.sim.phase="results";game.sim.winner=winner;game.sim.wins[winner]=2
+		game.sync_match_end_audio()
+		await snap("results-you-win" if winner==0 else "results-you-lose")
 	game.selected_mode=0;game.begin_bonus("kegs");game.sim.phase="fight";game.sim.score=2250
 	game.sync_match_end_audio();await snap("keg-score")
 	game.sim.finish(true);game.sync_match_end_audio();await snap("keg-payout")

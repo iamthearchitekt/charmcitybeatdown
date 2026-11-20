@@ -16,17 +16,13 @@ static func control(s,target:Dictionary)->Dictionary:
 			if probe.y<s.FLOOR:
 				probe.y=minf(s.FLOOR,probe.y+probe.vy);probe.vy+=s.GRAVITY
 			if s.challenge=="kegs":
-				prop.x+=prop.vx;prop.y+=prop.vy;prop.vy+=.9
-				if prop.y>=s.FLOOR:
-					prop.y=s.FLOOR
-					if not prop.bounced: prop.vy=-7;prop.bounced=true
-					else: prop.vy=0
+				s.advance_keg(prop)
 			if s.is_active(probe) and s.regions_overlap(s.attackboxes(probe,m),[s.object_box(prop)]).has_area():
 				if safe: return {"command":command.trim_prefix("c_"),"down":command.begins_with("c_")}
 			if s.challenge=="kegs" and s.hazard_touches(s.object_box(prop),probe): safe=false
 	if s.challenge=="boxes":
 		if absf(target.x-f.x)>130: return {"dx":facing}
-		if target.y<420 and f.y==s.FLOOR: return {"up":not f.up_prev}
+		if target.y<420 and f.y==s.FLOOR: return {"up":true}
 	else:
 		if absf(target.x-f.x)>285: return {"dx":facing}
 	return {}

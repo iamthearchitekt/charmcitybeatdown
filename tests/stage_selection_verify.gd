@@ -20,17 +20,18 @@ func run():
 	var previous=-1
 	var no_repeats=true
 	var correct_art=true
-	for i in 40:
+	var textures=[stage.background,stage.docks,stage.graffiti,stage.camden,stage.powerplant,stage.graveyard,stage.brewers,stage.bonus_texture,stage.stadium,stage.pimlico,stage.warehouse]
+	var materials=[stage.water_material,stage.docks_material,stage.graffiti_material,stage.camden_material,stage.powerplant_material,stage.graveyard_material,stage.brewers_material,stage.bonus_material,stage.stadium_material,stage.pimlico_material,stage.warehouse_material]
+	for i in 144:
 		stage.select_random()
 		if i==0: check(stage.last_stage==0,"First match after launch opens on Inner Harbor")
 		seen[stage.stage_name()]=true
 		if stage.last_stage==previous: no_repeats=false
 		previous=stage.last_stage
-		if stage.backdrop.texture!=[stage.background,stage.docks,stage.graffiti,stage.camden,stage.powerplant,stage.graveyard,stage.brewers][stage.last_stage]: correct_art=false
-		if stage.backdrop.material!=[stage.water_material,stage.docks_material,stage.graffiti_material,stage.camden_material,stage.powerplant_material,stage.graveyard_material,stage.brewers_material][stage.last_stage]: correct_art=false
-	check(no_repeats,"40 new matches never repeat the preceding stage")
-	check(seen.size()==7,"All seven Baltimore fight stages appear")
-	check(correct_art,"All seven stages use matching art and animation")
+		if stage.backdrop.texture!=textures[stage.last_stage] or stage.backdrop.material!=materials[stage.last_stage]: correct_art=false
+	check(no_repeats,"Automatic stage rotation never repeats the preceding stage")
+	check(seen.size()==Harbor.STAGE_NAMES.size(),"All eleven fight stages appear")
+	check(correct_art and stage.pimlico.get_size()==stage.camden.get_size() and stage.warehouse.get_size()==stage.camden.get_size(),"All eleven stages use matching art and animation")
 	var restarted=Harbor.new()
 	restarted.history_path=history_path
 	restarted.attach(layer)
@@ -40,18 +41,22 @@ func run():
 	root.add_child(game)
 	game.set_physics_process(false)
 	game.stage.history_path=history_path
-	game.begin_match()
-	check(game.stage.last_stage==0,"Live game begins its first fight on Inner Harbor")
+	game.action("mode1")
+	game.action("confirm")
+	game.action("confirm")
+	check(game.screen=="stage_select","Local Versus opens stage select after both fighters lock in")
+	game.action("stage10")
+	game.action("confirm")
+	check(game.screen=="match" and game.stage.current_index()==Harbor.WAREHOUSE,"Live Versus starts on the stage selected by the players")
 	var first=game.stage.stage_name()
 	game.sim.reset_round()
 	check(game.stage.stage_name()==first,"Stage stays fixed between rounds")
 	game.sim.phase="results"
 	game.sim.winner=0;game.sim.wins=[2,0]
 	game.action("rematch")
-	check(game.stage.stage_name()!=first,"Results rematch switches stages")
-	var previous_menu=game.stage.stage_name()
-	game.action("title");game.action("confirm");game.action("confirm")
-	check(not game.stage.first_match_pending and game.stage.stage_name()!=previous_menu,"Returning to menu continues randomized stage rotation")
+	check(game.stage.stage_name()==first,"Versus rematch keeps the selected stage")
+	game.action("title");game.action("mode2");game.action("confirm");game.action("confirm")
+	check(game.screen=="match" and game.sim.training and game.stage.stage_name()!=first,"Training still enters a stage automatically")
 	game.queue_free()
 	layer.queue_free()
 	stage=null

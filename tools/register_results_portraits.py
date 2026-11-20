@@ -26,6 +26,8 @@ for group, names in groups:
         for row, state in enumerate(["victory", "defeat"]):
             left = round(col * image.width / len(names))
             right = round((col + 1) * image.width / len(names))
+            if identity == "jeff" and state == "defeat":
+                left = 603  # The sleeve crosses the nominal column boundary.
             top = round(row * image.height / 2)
             bottom = round((row + 1) * image.height / 2)
             alpha = image.getchannel("A").crop((left, top, right, bottom))

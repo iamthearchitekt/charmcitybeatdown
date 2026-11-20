@@ -2,22 +2,24 @@ extends RefCounted
 
 const Combat=preload("res://scripts/combat.gd")
 const GroundShadow=preload("res://scripts/ground_shadow.gd")
-const CELL=Vector2(64,56)
+const Stage=preload("res://scripts/harbor_stage.gd")
+const CELL=Vector2(112,112)
+const PIXEL=.9*Combat.FIGHTER_SCALE
 const KEG=0
 const BOX=1
 const DRUM=2
 const CAN=3
-const SCALE=[2.65,2.58,3.45,3.0]
-const HEIGHTS=[120.0,94.0,139.0,144.0]
-const WIDTHS=[88.0,94.0,119.0,105.0]
+const HEIGHTS=[154.0,166.0,168.0,180.0]
+const WIDTHS=[118.0,166.0,136.0,139.0]
 const PROP_TYPES=["kegs","boxes","barrels","trash_cans"]
-const DEBRIS_COLORS=[Color("a8b0b2"),Color("ae814b"),Color("7c7866"),Color("9ba19e")]
+const DEBRIS_COLORS=[Color("a8b0b2"),Color("ae814b"),Color("637a89"),Color("9ba19e")]
 const SETS={
-	0:[[152.0,CAN]],
-	1:[[125.0,BOX],[245.0,DRUM],[1035.0,DRUM],[1155.0,BOX]],
-	2:[[156.0,CAN],[1124.0,CAN]],
-	4:[[152.0,KEG],[1120.0,KEG]],
-	6:[[158.0,KEG],[1126.0,KEG]],
+	0:[[92.0,CAN]],
+	1:[[88.0,BOX],[244.0,DRUM],[1037.0,BOX],[1206.0,DRUM]],
+	2:[[1034.0,CAN],[1195.0,CAN]],
+	4:[[96.0,KEG],[228.0,KEG]],
+	6:[[1039.0,KEG],[1193.0,KEG]],
+	Stage.WAREHOUSE:[[92.0,BOX],[264.0,BOX]],
 }
 static var props_atlas:Texture2D
 var objects:Array=[]
@@ -40,7 +42,16 @@ func box(prop:Dictionary)->Rect2:
 	var height:float=HEIGHTS[prop.kind]
 	return Rect2(prop.x-width*.5,Combat.FLOOR-height,width,height)
 
-func step(sim)->Array:
+func capture_pushback(sim)->Array:
+	var traces:Array=[]
+	for fighter in sim.fighters:
+		var flight:bool=fighter.state in ["knockdown","ko"]
+		var pushed:bool=fighter.state in ["hit","block"] and absf(fighter.vx)>.1
+		if (flight or pushed) and fighter.grabbed_by<0:
+			traces.append({"slot":fighter.slot,"start":Vector2(fighter.x,fighter.y),"body":sim.pushbox(fighter),"flight":flight,"vx":fighter.vx})
+	return traces
+
+func step(sim,prop_motion:Array=[])->Array:
 	var events:Array=[]
 	if objects.is_empty(): return events
 	for prop in objects:
@@ -51,6 +62,15 @@ func step(sim)->Array:
 		particle.velocity.y+=.32
 		particle.life-=1
 	debris=debris.filter(func(particle): return particle.life>0 and particle.position.y<Combat.FLOOR+4)
+	for trace in prop_motion:
+		var fighter:Dictionary=sim.fighters[trace.slot]
+		var travel=Vector2(fighter.x,fighter.y)-Vector2(trace.start)
+		if absf(travel.x)<=.1 and (not trace.flight or absf(travel.y)<=.1): continue
+		if not trace.flight and travel.x*trace.vx<=0.0: continue
+		var body:Rect2=trace.body
+		body.position+=travel
+		strike_props(sim,[body.merge(trace.body)],[],180,events)
+	if sim.phase!="fight": return events
 	for i in 2:
 		var fighter:Dictionary=sim.fighters[i]
 		var strike:Dictionary=strikes[i]
@@ -92,8 +112,8 @@ func draw(canvas:Node2D):
 		var x:float=prop.x
 		if prop.flash>0: x+=2.0 if prop.flash%2==0 else -2.0
 		GroundShadow.draw(canvas,Vector2(x,Combat.FLOOR),WIDTHS[prop.kind]*.53,4.2,.30)
-		var size=CELL*SCALE[prop.kind]
-		var target=Rect2(Vector2(roundf(x-size.x*.5),roundf(Combat.FLOOR-size.y+SCALE[prop.kind])),size)
+		var size=CELL*PIXEL
+		var target=Rect2(Vector2(roundf(x-size.x*.5),roundf(Combat.FLOOR-size.y+PIXEL)),size)
 		var source=Rect2(Vector2(frame,prop.kind)*CELL,CELL)
 		canvas.draw_texture_rect_region(props_atlas,target,source)
 	for particle in debris:

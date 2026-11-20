@@ -103,6 +103,12 @@
       ],
       "db": -13
     },
+    "sonic_boom": {
+      "files": [
+        "46_guile_sonicboom.wav"
+      ],
+      "db": -13
+    },
     "rise": {
       "files": [
         "59_whoosh.wav"
